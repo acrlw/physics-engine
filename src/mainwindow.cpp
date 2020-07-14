@@ -11,8 +11,10 @@ MainWindow::MainWindow(QWidget *parent)
     m_circle.setAngle(90);
     m_circle.setAngularVelocity(20);
     m_circle.setAngularAcceleration(-2);
-    m_rectangle.setAngle(126);
-    m_rectangle.setAngularVelocity(20);
+    m_rectangle.setAngle(-180);
+    m_rectangle.setWidth(80);
+    m_rectangle.setHeight(35);
+    m_rectangle.setAngularVelocity(18);
     m_rectangle.setAngularAcceleration(-2);
     m_timer.setInterval(alTimerInterval);
     m_circle.setSleep(false);

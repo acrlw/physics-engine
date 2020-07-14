@@ -118,7 +118,7 @@ void alCircleRenderer::render(QPainter *e)
 {
     if(m_visible)
     {
-        alRenderer::renderMassCenter(e, m_circle, m_strokeColor);
+        renderMassCenter(e, m_circle, m_strokeColor);
         //draw circle body
         e->setPen(QPen(m_strokeColor, m_thickness, Qt::SolidLine, Qt::RoundCap));
         QRectF r(m_circle->position().x() - m_circle->radius(),m_circle->position().y() - m_circle->radius(),m_circle->radius() * 2,m_circle->radius() * 2);
@@ -149,7 +149,7 @@ void alRectangleRenderer::render(QPainter *e)
     if(m_visible)
     {
         m_rectVertex = updateRectangle(m_rectangle);
-        alRenderer::renderMassCenter(e, m_rectangle, m_strokeColor);
+        renderMassCenter(e, m_rectangle, m_strokeColor);
         //render angle line
         alVec2 v = alRot(m_rectangle->angle()) * alVec2(m_rectangle->width() / 2, 0);
         QLineF l = QLineF(m_rectangle->position().x(), m_rectangle->position().y(),m_rectangle->position().x() + v.x(), m_rectangle->position().y() + v.y());
@@ -167,24 +167,9 @@ void alRectangleRenderer::render(QPainter *e)
 QPolygonF alRectangleRenderer::updateRectangle(alRectangle* rectangle)
 {
     QPolygonF vertex;
-    alVec2 topLeft(-rectangle->width() / 2, rectangle->height() / 2);
-    alVec2 topRight(rectangle->width() / 2, rectangle->height() / 2);
-    alVec2 bottomLeft(-rectangle->width() / 2, -rectangle->height() / 2);
-    alVec2 bottomRight(rectangle->width() / 2, -rectangle->height() / 2);
-    alRot r(rectangle->angle());
-    topLeft = r * topLeft;
-    topRight = r * topRight;
-    bottomLeft = r * bottomLeft;
-    bottomRight = r * bottomRight;
-    topLeft += rectangle->position();
-    topRight += rectangle->position();
-    bottomLeft += rectangle->position();
-    bottomRight += rectangle->position();
-    vertex.append(QPointF(topLeft.x(), topLeft.y()));
-    vertex.append(QPointF(bottomLeft.x(), bottomLeft.y()));
-    vertex.append(QPointF(bottomRight.x(), bottomRight.y()));
-    vertex.append(QPointF(topRight.x(), topRight.y()));
-    vertex.append(QPointF(topLeft.x(), topLeft.y()));
+    foreach (alVec2 v, rectangle->getActualVertices()) {
+        vertex.append(QPointF(v.x(), v.y()));
+    }
     return vertex;
 }
 

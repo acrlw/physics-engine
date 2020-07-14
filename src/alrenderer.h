@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QVector>
+#include <QDebug>
 #include <QPainterPath>
 #include <albody.h>
 class alRenderer : public QObject
@@ -51,7 +52,6 @@ public:
     {
         m_visible = visible;
     }
-    static void renderMassCenter(QPainter * e, alBody *body, const QColor &color);
     qreal angleLineThickness() const
     {
         return m_angleLineThickness;
@@ -62,6 +62,7 @@ public:
         m_angleLineThickness = angleLineThickness;
     }
 
+    void renderMassCenter(QPainter * e, alBody *body, const QColor &color);
 public slots:
     void handleMousePressEvent(QMouseEvent *e);
     void handleMouseMoveEvent(QMouseEvent *e);

@@ -1,11 +1,10 @@
 #ifndef ALBODY_H
 #define ALBODY_H
 
-#include <QDebug>
 #include <almath.h>
 #include <alsettings.h>
-
-
+#include <vector>
+#include <QDebug>
 ///deprecated
 enum Force{
     Fricion,
@@ -136,13 +135,38 @@ public:
 private:
     float m_radius;
 };
-class alRectangle : public alBody
+class alPolygon : public alBody{
+public:
+    std::vector<alVec2> &vertices()
+    {
+        return m_vertices;
+    }
+
+    void setVertices(const std::vector<alVec2> &vertices)
+    {
+        m_vertices = vertices;
+    }
+    std::vector<alVec2> getActualVertices()const
+    {
+        std::vector<alVec2> actual;
+        foreach (alVec2 v, m_vertices) {
+            v = alRot(m_angle) * v;
+            v += m_position;
+            actual.push_back(v);
+        }
+        return actual;
+    }
+protected:
+    std::vector<alVec2> m_vertices;
+};
+
+class alRectangle : public alPolygon
 {
 public:
     alRectangle(const float width = 50, const float height = 50):
-        alBody(), m_width(width), m_height(height)
+        alPolygon(), m_width(width), m_height(height)
     {
-
+        updateVertices();
     }
 
     float width() const
@@ -153,6 +177,7 @@ public:
     void setWidth(float width)
     {
         m_width = width;
+        updateVertices();
     }
 
     float height() const
@@ -163,10 +188,22 @@ public:
     void setHeight(float height)
     {
         m_height = height;
+        updateVertices();
     }
+
 protected:
     float m_width;
     float m_height;
+private:
+    void updateVertices()
+    {
+        m_vertices.clear();
+        m_vertices.push_back(alVec2(-m_width / 2, m_height / 2));
+        m_vertices.push_back(alVec2(-m_width / 2, -m_height / 2));
+        m_vertices.push_back(alVec2(m_width / 2, -m_height / 2));
+        m_vertices.push_back(alVec2(m_width / 2, m_height / 2));
+        m_vertices.push_back(alVec2(-m_width / 2, m_height / 2));
+    }
 };
 class alWall : public alRectangle
 {
