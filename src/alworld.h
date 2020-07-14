@@ -11,6 +11,8 @@ public:
     void update();
 private:
     QVector<alBody*> m_bodyList;
+    alVec2 m_gravity;
+
 };
 
 #endif // ALWORLD_H

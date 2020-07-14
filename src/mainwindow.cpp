@@ -8,17 +8,18 @@ MainWindow::MainWindow(QWidget *parent)
     m_rectangle.setPosition(alVec2(200, 400));
     m_circle.setPosition(alVec2(200, 200));
     m_circle.setRadius(60);
-    m_circle.setAngle(90);
+    m_circle.setAngle(360);
     m_circle.setAngularVelocity(20);
     m_circle.setAngularAcceleration(-2);
-    m_rectangle.setAngle(-180);
-    m_rectangle.setWidth(80);
-    m_rectangle.setHeight(35);
+    m_rectangle.setAngle(-360);
+    m_rectangle.setWidth(255);
+    m_rectangle.setHeight(136);
     m_rectangle.setAngularVelocity(18);
     m_rectangle.setAngularAcceleration(-2);
     m_timer.setInterval(alTimerInterval);
     m_circle.setSleep(false);
     m_rectangle.setSleep(false);
+    m_polygon.setSleep(false);
     alVec2 v1(2, 2);
     alVec2 a1 = v1.getNormalizedVector() * -3;
     m_circle.velocity() += v1;
@@ -33,12 +34,17 @@ MainWindow::MainWindow(QWidget *parent)
     m_measurer.bodyList().append(&m_circle);
     m_measurer.bodyList().append(&m_rectangle);
     m_circleRenderer.setThickness(3);
-    m_circleRenderer.setFillColor(Qt::darkCyan);
+
+
     m_circleRenderer.setAngleLineThickness(2);
     m_rectangleRenderer.setThickness(3);
     m_rectangleRenderer.setAngleLineThickness(2);
-    m_rectangleRenderer.setFillColor(Qt::blue);
-    m_rectangleRenderer.setStrokeColor(Qt::darkBlue);
+
+    QColor bc2(Qt::blue);
+    bc2.setAlphaF(0.12);
+    m_rectangleRenderer.fillBrush().setColor(bc2);
+
+    m_rectangleRenderer.strokePen().setColor(Qt::darkBlue);
     m_measurer.setVelocityColor(Qt::darkMagenta);
     m_measurer.setAccelerationColor(Qt::darkCyan);
 
@@ -46,6 +52,25 @@ MainWindow::MainWindow(QWidget *parent)
     m_wallRenderer.wallList().append(&w2);
     m_wallRenderer.wallList().append(&w3);
     m_wallRenderer.wallList().append(&w4);
+
+    m_polygon.vertices().push_back(alVec2(3, 4) * 20);
+    m_polygon.vertices().push_back(alVec2(1, 8) * 20);
+    m_polygon.vertices().push_back(alVec2(-1, 5) * 20);
+    m_polygon.vertices().push_back(alVec2(-8, 1) * 20);
+    m_polygon.vertices().push_back(alVec2(-3, -4) * 20);
+    m_polygon.vertices().push_back(alVec2(-1, -8) * 20);
+    m_polygon.vertices().push_back(alVec2(3, -4) * 20);
+    m_polygon.vertices().push_back(alVec2(9, -2) * 20);
+    m_polygon.vertices().push_back(alVec2(3, 4) * 20);
+    m_polygon.velocity() += v1;
+    m_polygon.acceleration() += a1;
+    m_polygon.setAngle(-136);
+    m_polygon.setAngularVelocity(10);
+    m_polygon.setAngularAcceleration(-2);
+    m_polygon.setPosition(alVec2(200, 200));
+    m_polygonRenderer.setThickness(2);
+    m_polygonRenderer.setAngleLineThickness(2);
+    m_polygonRenderer.setPolygon(&m_polygon);
     this->resize(1440, 900);
 }
 void MainWindow::processObjectMovement()
@@ -63,7 +88,9 @@ void MainWindow::processObjectMovement()
     alVec2 v = m_circle.velocity();
 
     alVec2 v2 = m_rectangle.velocity();
-    alVec2 a1, a2;
+
+    alVec2 v3 = m_polygon.velocity();
+    alVec2 a1, a2, a3;
     //friction & static judgement
     if(v.length() - alStopThreshold < 0.0101)
     {
@@ -81,6 +108,14 @@ void MainWindow::processObjectMovement()
     else{
         a2 += v2.getNormalizedVector() * -1;
     }
+    if(v3.length() - alStopThreshold < 0.0101)
+    {
+        a3 += alVec2(0, 0);
+        m_polygon.velocity().set(0, 0);
+    }
+    else{
+        a3 += v3.getNormalizedVector() * -1;
+    }
     float an = m_rectangle.angularVelocity();
     if(an * (an + m_rectangle.angularAcceleration() * alDeltaTime) < 0)
     {
@@ -93,10 +128,18 @@ void MainWindow::processObjectMovement()
         m_circle.setAngularVelocity(0);
         m_circle.setAngularAcceleration(0);
     }
+    float cn = m_polygon.angularVelocity();
+    if(cn * (cn + m_polygon.angularAcceleration() * alDeltaTime) < 0)
+    {
+        m_polygon.setAngularVelocity(0);
+        m_polygon.setAngularAcceleration(0);
+    }
     m_circle.acceleration() = a1;
     m_rectangle.acceleration() = a2;
+    m_polygon.acceleration() = a3;
     m_circle.update();
     m_rectangle.update();
+    m_polygon.update();
     repaint();
 }
 void MainWindow::paintEvent(QPaintEvent *e)
@@ -107,6 +150,7 @@ void MainWindow::paintEvent(QPaintEvent *e)
     m_rectangleRenderer.render(&painter);
     m_measurer.render(&painter);
     m_wallRenderer.render(&painter);
+    m_polygonRenderer.render(&painter);
 }
 void MainWindow::mousePressEvent(QMouseEvent * e)
 {

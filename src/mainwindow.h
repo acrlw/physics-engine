@@ -35,9 +35,11 @@ private:
     Ui::MainWindow *ui;
     alCircle m_circle;
     alRectangle m_rectangle;
+    alPolygon m_polygon;
     QTimer m_timer;
     alCircleRenderer m_circleRenderer;
     alRectangleRenderer m_rectangleRenderer;
+    alPolygonRenderer m_polygonRenderer;
     alMeasurer m_measurer;
     bool m_mousePress = false;
     QPointF m_mousePos;

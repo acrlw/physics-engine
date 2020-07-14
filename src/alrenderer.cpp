@@ -2,10 +2,13 @@
 
 
 
-alRenderer::alRenderer(const bool visible, const qreal thickness, const QColor strikeColor, const QColor fillcolor, const QColor &centerColor)
-    : QObject(), m_visible(visible), m_angleLineThickness(1), m_thickness(thickness), m_strokeColor(strikeColor), m_fillColor(fillcolor), m_centerColor(centerColor)
+alRenderer::alRenderer(const bool visible, const QColor &centerColor)
+    : QObject(), m_visible(visible), m_angleLineThickness(1), m_centerColor(centerColor)
 {
-
+    m_strokePen = QPen(Qt::darkCyan, m_thickness, Qt::SolidLine, Qt::RoundCap);
+    QColor bc(Qt::darkGreen);
+    bc.setAlphaF(0.12);
+    m_fillBrush = QBrush(bc);
 }
 
 void alRenderer::renderMassCenter(QPainter * e, alBody *body, const QColor &color)
@@ -36,10 +39,14 @@ void alRenderer::handlePaintEvent(QPainter *e)
 
 
 
-alMeasurer::alMeasurer(const qreal arrowSize, const qreal fontSize, const qreal distance, const QColor& accelerationColor, const QColor& velocityColor):
+
+
+
+alMeasurer::alMeasurer(const qreal arrowSize, const qreal fontSize, const qreal distance, const qreal thickness, const QColor& accelerationColor, const QColor& velocityColor):
     alRenderer(), m_accelerationColor(accelerationColor), m_velocityColor(velocityColor), m_arrowSize(arrowSize), m_fontSize(fontSize), m_textDistance(distance)
 {
-
+    m_type = RenderType::Measurer;
+    m_thickness = thickness;
 }
 
 void alMeasurer::renderArrow(QPainter * painter,const QPointF& start, const QPointF& end, const QString& text, const QColor& color)
@@ -113,27 +120,28 @@ alCircleRenderer::alCircleRenderer(alCircle *circlePtr, const qreal angleLineThi
     alRenderer(), m_circle(circlePtr)
 {
     m_angleLineThickness = angleLineThickness;
+    m_type = RenderType::Circle;
 }
 void alCircleRenderer::render(QPainter *e)
 {
     if(m_visible)
     {
-        renderMassCenter(e, m_circle, m_strokeColor);
+        renderMassCenter(e, m_circle, m_strokePen.color());
         //draw circle body
-        e->setPen(QPen(m_strokeColor, m_thickness, Qt::SolidLine, Qt::RoundCap));
+        e->setPen(m_strokePen);
         QRectF r(m_circle->position().x() - m_circle->radius(),m_circle->position().y() - m_circle->radius(),m_circle->radius() * 2,m_circle->radius() * 2);
 
         e->drawEllipse(r);
         //draw angle line
         alVec2 v = alRot(m_circle->angle()) * alVec2(m_circle->radius(), 0);
         QLineF l = QLineF(m_circle->position().x(), m_circle->position().y(),m_circle->position().x() + v.x(), m_circle->position().y() + v.y());
-        e->setPen(QPen(m_strokeColor, m_angleLineThickness, Qt::SolidLine, Qt::RoundCap));
+        m_strokePen.setWidth(m_angleLineThickness);
+        e->setPen(m_strokePen);
         e->drawLine(l);
         //fill circle
-        m_fillColor.setAlphaF(0.12);
         QPainterPath p;
         p.addEllipse(r);
-        e->fillPath(p,QBrush(m_fillColor));
+        e->fillPath(p,m_fillBrush);
     }
 }
 
@@ -142,36 +150,53 @@ alRectangleRenderer::alRectangleRenderer(alRectangle *rectPtr, const qreal borde
     alRenderer(), m_rectangle(rectPtr)
 {
     m_thickness = borderThickness;
+    m_type = RenderType::Polygon;
 }
 
 void alRectangleRenderer::render(QPainter *e)
 {
     if(m_visible)
     {
-        m_rectVertex = updateRectangle(m_rectangle);
-        renderMassCenter(e, m_rectangle, m_strokeColor);
+        m_rectVertex = alPolygonRenderer::updateVertices(m_rectangle);
+        renderMassCenter(e, m_rectangle, m_strokePen.color());
         //render angle line
         alVec2 v = alRot(m_rectangle->angle()) * alVec2(m_rectangle->width() / 2, 0);
         QLineF l = QLineF(m_rectangle->position().x(), m_rectangle->position().y(),m_rectangle->position().x() + v.x(), m_rectangle->position().y() + v.y());
-        e->setPen(QPen(m_strokeColor, m_angleLineThickness, Qt::SolidLine, Qt::RoundCap));
+        m_strokePen.setWidth(m_angleLineThickness);
+        e->setPen(m_strokePen);
         e->drawLine(l);
-        e->setPen(QPen(m_strokeColor, m_thickness, Qt::SolidLine, Qt::RoundCap));
+        m_strokePen.setWidth(m_thickness);
         e->drawPolygon(m_rectVertex);
-        m_fillColor.setAlphaF(0.1);
         QPainterPath p;
         p.addPolygon(m_rectVertex);
-        e->fillPath(p,QBrush(m_fillColor));
+        e->fillPath(p,m_fillBrush);
     }
 }
 
-QPolygonF alRectangleRenderer::updateRectangle(alRectangle* rectangle)
+QPolygonF alPolygonRenderer::updateVertices(alPolygon* polygon)
 {
     QPolygonF vertex;
-    foreach (alVec2 v, rectangle->getActualVertices()) {
+    foreach (alVec2 v, polygon->getActualVertices()) {
         vertex.append(QPointF(v.x(), v.y()));
     }
     return vertex;
 }
+
+void alPolygonRenderer::render(QPainter *e)
+{
+    if(m_visible)
+    {
+        QPolygonF vertex = updateVertices(m_polygon);
+        e->setPen(m_strokePen);
+        e->drawLine(QLineF(m_polygon->position().x(), m_polygon->position().y(), vertex[0].x(),vertex[0].y()));
+        m_strokePen.setWidth(m_thickness);
+        e->drawPolygon(vertex);
+        QPainterPath p;
+        p.addPolygon(vertex);
+        e->fillPath(p,m_fillBrush);
+    }
+}
+
 
 
 void alWallRenderer::render(QPainter *e)
@@ -179,13 +204,14 @@ void alWallRenderer::render(QPainter *e)
     if(m_visible)
     {
         foreach (alWall* w, m_wallList) {
-            QPolygonF pw = alRectangleRenderer::updateRectangle(w);
-            e->setPen(QPen(m_strokeColor, m_thickness, Qt::SolidLine, Qt::RoundCap));
+            QPolygonF pw = alPolygonRenderer::updateVertices(w);
+            e->setPen(m_strokePen);
             e->drawPolygon(pw);
-            m_fillColor.setAlphaF(0.1);
             QPainterPath p;
             p.addPolygon(pw);
-            e->fillPath(p,QBrush(m_fillColor));
+            e->fillPath(p,m_fillBrush);
         }
     }
 }
+
+

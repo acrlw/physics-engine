@@ -6,11 +6,7 @@
 #include <vector>
 #include <QDebug>
 ///deprecated
-enum Force{
-    Fricion,
-    Constant,
-    Elastic
-};
+
 
 class alBody
 {
@@ -19,6 +15,10 @@ public:
     {
 
     }
+    enum BodyType{
+        Circle,
+        Polygon
+    };
     inline alVec2& velocity()
     {
         return m_velocity;
@@ -100,6 +100,17 @@ public:
         }
 
     }
+
+    BodyType type() const
+    {
+        return m_type;
+    }
+
+    void setType(const BodyType &type)
+    {
+        m_type = type;
+    }
+
 protected:
     bool m_sleep;
     float m_mass;
@@ -109,6 +120,7 @@ protected:
     alVec2 m_velocity;
     alVec2 m_acceleration;
     alVec2 m_position;
+    BodyType m_type;
 };
 class alCircle: public alBody{
 
@@ -118,6 +130,7 @@ public:
     {
         m_angle = angle;
         m_mass = m;
+        m_type = BodyType::Circle;
     }
 
 
@@ -137,6 +150,9 @@ private:
 };
 class alPolygon : public alBody{
 public:
+    alPolygon(){
+        m_type = BodyType::Polygon;
+    }
     std::vector<alVec2> &vertices()
     {
         return m_vertices;

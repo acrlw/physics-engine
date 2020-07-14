@@ -12,36 +12,15 @@ class alRenderer : public QObject
 {
     Q_OBJECT
 public:
-    alRenderer(const bool visible = true , const qreal thickness = 1, const QColor m_strikeColor = Qt::darkCyan, const QColor fillcolor = Qt::darkGreen, const QColor &centerColor = Qt::darkBlue);
+    alRenderer(const bool visible = true , const QColor &centerColor = Qt::darkBlue);
+    enum RenderType{
+        Measurer,
+        Circle,
+        Polygon,
+        Wall,
+        World
+    };
 
-    qreal thickness() const
-    {
-        return m_thickness;
-    }
-    void setThickness(const qreal &thickness)
-    {
-        m_thickness = thickness;
-    }
-
-    QColor fillColor() const
-    {
-        return m_fillColor;
-    }
-
-    void setFillColor(const QColor &fillColor)
-    {
-        m_fillColor = fillColor;
-    }
-
-    QColor strokeColor() const
-    {
-        return m_strokeColor;
-    }
-
-    void setStrokeColor(const QColor &strokeColor)
-    {
-        m_strokeColor = strokeColor;
-    }
 
     bool visible() const
     {
@@ -63,6 +42,50 @@ public:
     }
 
     void renderMassCenter(QPainter * e, alBody *body, const QColor &color);
+
+    RenderType type() const
+    {
+        return m_type;
+    }
+
+    void setType(const RenderType &type)
+    {
+        m_type = type;
+    }
+
+    QPen& strokePen()
+    {
+        return m_strokePen;
+    }
+
+    void setStrokePen(const QPen &strokePen)
+    {
+        m_strokePen = strokePen;
+    }
+
+
+    QBrush& fillBrush()
+    {
+        return m_fillBrush;
+    }
+
+    void setFillBrush(const QBrush &fillBrush)
+    {
+        m_fillBrush = fillBrush;
+    }
+
+    qreal thickness() const
+    {
+        return m_thickness;
+    }
+
+    void setThickness(const qreal &thickness)
+    {
+        m_thickness = thickness;
+    }
+
+
+
 public slots:
     void handleMousePressEvent(QMouseEvent *e);
     void handleMouseMoveEvent(QMouseEvent *e);
@@ -71,17 +94,19 @@ public slots:
 protected:
     bool m_visible;
     qreal m_angleLineThickness;
-    qreal m_thickness;
-    QColor m_strokeColor;
-    QColor m_fillColor;
     QColor m_centerColor;
+    QBrush m_fillBrush;
+    QPen m_strokePen;
+    QPen b;
+    qreal m_thickness;
+    RenderType m_type;
 };
 
 class alMeasurer : public alRenderer{
     Q_OBJECT
 
 public:
-    alMeasurer(const qreal arrowSize = 6, const qreal fontSize = 8, const qreal distance = 20, const QColor &accelerationColor = Qt::darkRed, const QColor &velocityColor = Qt::darkCyan);
+    alMeasurer(const qreal arrowSize = 8, const qreal fontSize = 10, const qreal distance = 20, const qreal thickness = 2, const QColor &accelerationColor = Qt::darkRed, const QColor &velocityColor = Qt::darkCyan);
     inline QVector<alBody *>& bodyList()
     {
         return m_bodyList;
@@ -108,8 +133,6 @@ public:
     {
         m_arrowSize = arrowSize;
     }
-
-
     qreal textDistance() const
     {
         return m_textDistance;
@@ -129,10 +152,6 @@ public:
     {
         m_fontSize = fontSize;
     }
-
-
-
-
     QColor velocityColor() const
     {
         return m_velocityColor;
@@ -152,10 +171,6 @@ public:
     {
         m_accelerationColor = accelerationColor;
     }
-
-
-
-
 
     void renderArrow(QPainter *painter, const QPointF &start, const QPointF &end, const QString &text, const QColor& color);
 
@@ -200,6 +215,29 @@ public slots:
 private:
     alCircle *m_circle;
 };
+class alPolygonRenderer : public alRenderer
+{
+    Q_OBJECT
+public:
+    alPolygonRenderer(){
+
+    }
+    alPolygon *polygon() const
+    {
+        return m_polygon;
+    }
+
+    void setPolygon(alPolygon *polygon)
+    {
+        m_polygon = polygon;
+    }
+
+    static QPolygonF updateVertices(alPolygon *polygon);
+public slots:
+    void render(QPainter *e);
+private:
+    alPolygon *m_polygon;
+};
 class alRectangleRenderer : public alRenderer
 {
     Q_OBJECT
@@ -214,7 +252,7 @@ public:
     void setRectangle(alRectangle *rectangle)
     {
         m_rectangle = rectangle;
-        m_rectVertex = updateRectangle(m_rectangle);
+        m_rectVertex = alPolygonRenderer::updateVertices(m_rectangle);
     }
 
     inline bool isInArea(const QPointF& pos)
@@ -222,16 +260,19 @@ public:
         return (abs(pos.x() - m_rectangle->position().x()) < m_rectangle->width() / 2) &&
                 (abs(pos.y() - m_rectangle->position().y()) < m_rectangle->height() / 2);
     }
-    static QPolygonF updateRectangle(alRectangle *rectangle);
 public slots:
     void render(QPainter *e) ;
 protected:
     QPolygonF m_rectVertex;
     alRectangle *m_rectangle;
 };
+
 class alWallRenderer: public alRenderer{
     Q_OBJECT
 public:
+    alWallRenderer(){
+        m_type = RenderType::Wall;
+    }
     QVector<alWall*> &wallList()
     {
         return m_wallList;
@@ -247,4 +288,11 @@ private:
     QVector<alWall*> m_wallList;
 };
 
+class alWorldRenderer: public alRenderer
+{
+public:
+    alWorldRenderer() {
+        m_type = RenderType::World;
+    }
+};
 #endif // ALRENDERER_H
