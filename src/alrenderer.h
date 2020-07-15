@@ -41,7 +41,6 @@ public:
         m_angleLineThickness = angleLineThickness;
     }
 
-    void renderMassCenter(QPainter * e, alBody *body, const QColor &color);
 
     RenderType type() const
     {
@@ -91,7 +90,9 @@ public slots:
     void handleMouseMoveEvent(QMouseEvent *e);
     void handleMouseReleaseEvent(QMouseEvent *e);
     void handlePaintEvent(QPainter *e);
+    virtual void render(QPainter *e) = 0;
 protected:
+
     bool m_visible;
     qreal m_angleLineThickness;
     QColor m_centerColor;
@@ -101,10 +102,22 @@ protected:
     qreal m_thickness;
     RenderType m_type;
 };
-
-class alMeasurer : public alRenderer{
+class alBodyRenderer : public alRenderer
+{
     Q_OBJECT
+public:
+    alBodyRenderer() {
+        m_touchPen  = QPen(QColor(255, 120, 0), m_thickness, Qt::SolidLine, Qt::RoundCap);
+    };
 
+    void renderMassCenter(QPainter * e, alBody *body, const QColor &color);
+
+protected:
+    QPen m_touchPen;
+};
+class alMeasurer : public alRenderer
+{
+    Q_OBJECT
 public:
     alMeasurer(const qreal arrowSize = 8, const qreal fontSize = 10, const qreal distance = 20, const qreal thickness = 2, const QColor &accelerationColor = Qt::darkRed, const QColor &velocityColor = Qt::darkCyan);
     inline QVector<alBody *>& bodyList()
@@ -176,98 +189,115 @@ public:
 
 public slots:
 
-    void render(QPainter *e) ;
+    void render(QPainter *e)override;
 private:
     QColor m_accelerationColor;
     QColor m_velocityColor;
     QPainter * m_painter;
     QVector<alBody *> m_bodyList;
-    bool m_visible = true;
+    bool m_centerPathVisible;
+    bool m_visible;
     qreal m_arrowSize;
     qreal m_fontSize;
     qreal m_textDistance;
 };
 
-class alCircleRenderer : public alRenderer{
+class alCircleRenderer : public alBodyRenderer
+{
     Q_OBJECT
-
 public:
-    alCircleRenderer(alCircle * circlePtr = nullptr,const qreal angleLineThickness = 1);
+    alCircleRenderer(const qreal angleLineThickness = 1);
 
-    inline alCircle *circle() const
+
+    inline bool isInArea(alCircle * circle, const QPointF& pos)
     {
-        return m_circle;
+        return alVecter2(pos.x() - circle->position().x(), pos.y() - circle->position().y()).lengthSquare() <= circle->radius() * circle->radius();
     }
 
-    inline void setCircle(alCircle *circle)
+
+    QVector<alCircle *>& circleList()
     {
-        m_circle = circle;
+        return m_circleList;
     }
-    inline bool isInArea(const QPointF& pos)
+
+    void setCircleList(const QVector<alCircle *> &circleList)
     {
-        return alVec2(pos.x() - m_circle->position().x(), pos.y() - m_circle->position().y()).lengthSquare() <= m_circle->radius() * m_circle->radius();
+        m_circleList = circleList;
     }
+
 
 
 public slots:
-    void render(QPainter *e) ;
+    void render(QPainter *e)override;
 
 private:
-    alCircle *m_circle;
+    QVector<alCircle *> m_circleList;
 };
-class alPolygonRenderer : public alRenderer
+
+class alPolygonRenderer : public alBodyRenderer
 {
     Q_OBJECT
 public:
     alPolygonRenderer(){
 
     }
-    alPolygon *polygon() const
+
+
+    QVector<alPolygon *>& polygonList()
     {
-        return m_polygon;
+        return m_polygonList;
     }
 
-    void setPolygon(alPolygon *polygon)
+    void setPolygonList(const QVector<alPolygon *> &polygonList)
     {
-        m_polygon = polygon;
+        m_polygonList = polygonList;
     }
-
-    static QPolygonF updateVertices(alPolygon *polygon);
+public:
+    QPolygonF updateVertices(alPolygon* polygon)
+    {
+        QPolygonF vertex;
+        foreach (alVecter2 v, polygon->getActualVertices()) {
+            vertex.append(QPointF(v.x(), v.y()));
+        }
+        return vertex;
+    }
 public slots:
-    void render(QPainter *e);
+    void render(QPainter *e)override;
 private:
-    alPolygon *m_polygon;
+    QVector<alPolygon *> m_polygonList;
 };
-class alRectangleRenderer : public alRenderer
+
+class alRectangleRenderer : public alPolygonRenderer
 {
     Q_OBJECT
 public:
-    alRectangleRenderer(alRectangle * rectPtr = nullptr, const qreal borderThickness = 1);
+    alRectangleRenderer(const qreal borderThickness = 1);
 
-    alRectangle *rectangle() const
+    //will deprecate
+    inline bool isInArea(alRectangle * rectangle, const QPointF& pos)
     {
-        return m_rectangle;
+        return (abs(pos.x() - rectangle->position().x()) < rectangle->width() / 2) &&
+                (abs(pos.y() - rectangle->position().y()) < rectangle->height() / 2);
+    }
+    QVector<alRectangle *>& rectangleList()
+    {
+        return m_rectangleList;
     }
 
-    void setRectangle(alRectangle *rectangle)
+    void setRectangleList(const QVector<alRectangle *> &rectangleList)
     {
-        m_rectangle = rectangle;
-        m_rectVertex = alPolygonRenderer::updateVertices(m_rectangle);
+        m_rectangleList = rectangleList;
     }
 
-    inline bool isInArea(const QPointF& pos)
-    {
-        return (abs(pos.x() - m_rectangle->position().x()) < m_rectangle->width() / 2) &&
-                (abs(pos.y() - m_rectangle->position().y()) < m_rectangle->height() / 2);
-    }
+
 public slots:
-    void render(QPainter *e) ;
+    void render(QPainter *e)override;
 protected:
     QPolygonF m_rectVertex;
-    alRectangle *m_rectangle;
+    QVector<alRectangle *> m_rectangleList;
 };
 
-class alWallRenderer: public alRenderer{
+class alWallRenderer: public alRectangleRenderer{
     Q_OBJECT
 public:
     alWallRenderer(){
@@ -283,7 +313,7 @@ public:
     }
 
 public slots:
-    void render(QPainter * e);
+    void render(QPainter * e)override;
 private:
     QVector<alWall*> m_wallList;
 };

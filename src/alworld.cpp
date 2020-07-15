@@ -1,6 +1,8 @@
 #include "alworld.h"
 
-alWorld::alWorld()
+
+
+void alWorld::update()
 {
 
 }

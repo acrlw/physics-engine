@@ -5,13 +5,12 @@
 #include <alsettings.h>
 #include <vector>
 #include <QDebug>
-///deprecated
 
 
 class alBody
 {
 public:
-    alBody(const float m = 1): m_sleep(true), m_mass(m), m_angle(0) , m_angularAcceleration(0), m_angularVelocity(0)
+    alBody(const float m = 1): m_sleep(true), m_isTouched(false), m_mass(m), m_angle(0) , m_angularAcceleration(0), m_angularVelocity(0)
     {
 
     }
@@ -19,27 +18,27 @@ public:
         Circle,
         Polygon
     };
-    inline alVec2& velocity()
+    inline alVecter2& velocity()
     {
         return m_velocity;
     }
-    inline void setVelocity(const alVec2 &velocity)
+    inline void setVelocity(const alVecter2 &velocity)
     {
         m_velocity = velocity;
     }
-    inline alVec2& acceleration()
+    inline alVecter2& acceleration()
     {
         return m_acceleration;
     }
-    inline void setAcceleration(const alVec2 &acceleration)
+    inline void setAcceleration(const alVecter2 &acceleration)
     {
         m_acceleration = acceleration;
     }
-    inline alVec2& position()
+    inline alVecter2& position()
     {
         return m_position;
     }
-    inline void setPosition(const alVec2 &position)
+    inline void setPosition(const alVecter2 &position)
     {
         m_position = position;
     }
@@ -111,15 +110,26 @@ public:
         m_type = type;
     }
 
+    bool isTouched() const
+    {
+        return m_isTouched;
+    }
+
+    void setIsTouched(bool isTouched)
+    {
+        m_isTouched = isTouched;
+    }
+
 protected:
     bool m_sleep;
+    bool m_isTouched;
     float m_mass;
     float m_angle;
     float m_angularAcceleration;
     float m_angularVelocity;
-    alVec2 m_velocity;
-    alVec2 m_acceleration;
-    alVec2 m_position;
+    alVecter2 m_velocity;
+    alVecter2 m_acceleration;
+    alVecter2 m_position;
     BodyType m_type;
 };
 class alCircle: public alBody{
@@ -153,27 +163,27 @@ public:
     alPolygon(){
         m_type = BodyType::Polygon;
     }
-    std::vector<alVec2> &vertices()
+    std::vector<alVecter2> &vertices()
     {
         return m_vertices;
     }
 
-    void setVertices(const std::vector<alVec2> &vertices)
+    void setVertices(const std::vector<alVecter2> &vertices)
     {
         m_vertices = vertices;
     }
-    std::vector<alVec2> getActualVertices()const
+    std::vector<alVecter2> getActualVertices()const
     {
-        std::vector<alVec2> actual;
-        foreach (alVec2 v, m_vertices) {
-            v = alRot(m_angle) * v;
+        std::vector<alVecter2> actual;
+        foreach (alVecter2 v, m_vertices) {
+            v = alRotation(m_angle) * v;
             v += m_position;
             actual.push_back(v);
         }
         return actual;
     }
 protected:
-    std::vector<alVec2> m_vertices;
+    std::vector<alVecter2> m_vertices;
 };
 
 class alRectangle : public alPolygon
@@ -214,11 +224,11 @@ private:
     void updateVertices()
     {
         m_vertices.clear();
-        m_vertices.push_back(alVec2(-m_width / 2, m_height / 2));
-        m_vertices.push_back(alVec2(-m_width / 2, -m_height / 2));
-        m_vertices.push_back(alVec2(m_width / 2, -m_height / 2));
-        m_vertices.push_back(alVec2(m_width / 2, m_height / 2));
-        m_vertices.push_back(alVec2(-m_width / 2, m_height / 2));
+        m_vertices.push_back(alVecter2(-m_width / 2, m_height / 2));
+        m_vertices.push_back(alVecter2(-m_width / 2, -m_height / 2));
+        m_vertices.push_back(alVecter2(m_width / 2, -m_height / 2));
+        m_vertices.push_back(alVecter2(m_width / 2, m_height / 2));
+        m_vertices.push_back(alVecter2(-m_width / 2, m_height / 2));
     }
 };
 class alWall : public alRectangle

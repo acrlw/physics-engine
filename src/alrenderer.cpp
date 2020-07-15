@@ -11,11 +11,6 @@ alRenderer::alRenderer(const bool visible, const QColor &centerColor)
     m_fillBrush = QBrush(bc);
 }
 
-void alRenderer::renderMassCenter(QPainter * e, alBody *body, const QColor &color)
-{
-    e->setPen(QPen(color, 4, Qt::SolidLine, Qt::RoundCap));
-    e->drawPoint(QPointF(body->position().x(), body->position().y()));
-}
 
 void alRenderer::handleMousePressEvent(QMouseEvent *e)
 {
@@ -47,6 +42,8 @@ alMeasurer::alMeasurer(const qreal arrowSize, const qreal fontSize, const qreal 
 {
     m_type = RenderType::Measurer;
     m_thickness = thickness;
+    m_visible = true;
+    m_centerPathVisible = false;
 }
 
 void alMeasurer::renderArrow(QPainter * painter,const QPointF& start, const QPointF& end, const QString& text, const QColor& color)
@@ -116,8 +113,8 @@ void alMeasurer::render(QPainter *e)
     }
 }
 
-alCircleRenderer::alCircleRenderer(alCircle *circlePtr, const qreal angleLineThickness):
-    alRenderer(), m_circle(circlePtr)
+alCircleRenderer::alCircleRenderer(const qreal angleLineThickness):
+    alBodyRenderer()
 {
     m_angleLineThickness = angleLineThickness;
     m_type = RenderType::Circle;
@@ -126,28 +123,31 @@ void alCircleRenderer::render(QPainter *e)
 {
     if(m_visible)
     {
-        renderMassCenter(e, m_circle, m_strokePen.color());
-        //draw circle body
-        e->setPen(m_strokePen);
-        QRectF r(m_circle->position().x() - m_circle->radius(),m_circle->position().y() - m_circle->radius(),m_circle->radius() * 2,m_circle->radius() * 2);
-
-        e->drawEllipse(r);
-        //draw angle line
-        alVec2 v = alRot(m_circle->angle()) * alVec2(m_circle->radius(), 0);
-        QLineF l = QLineF(m_circle->position().x(), m_circle->position().y(),m_circle->position().x() + v.x(), m_circle->position().y() + v.y());
-        m_strokePen.setWidth(m_angleLineThickness);
-        e->setPen(m_strokePen);
-        e->drawLine(l);
-        //fill circle
-        QPainterPath p;
-        p.addEllipse(r);
-        e->fillPath(p,m_fillBrush);
+        foreach (alCircle* circle, m_circleList) {
+            renderMassCenter(e, circle, m_strokePen.color());
+            //draw circle body
+            m_touchPen.setWidth(m_thickness);
+            m_strokePen.setWidth(m_thickness);
+            e->setPen(circle->isTouched() ? m_touchPen : m_strokePen);
+            QRectF r(circle->position().x() - circle->radius(),circle->position().y() - circle->radius(),circle->radius() * 2,circle->radius() * 2);
+            e->drawEllipse(r);
+            //draw angle line
+            m_strokePen.setWidth(m_angleLineThickness);
+            e->setPen(m_strokePen);
+            alVecter2 v = alRotation(circle->angle()) * alVecter2(circle->radius(), 0);
+            QLineF l = QLineF(circle->position().x(), circle->position().y(),circle->position().x() + v.x(), circle->position().y() + v.y());
+            e->drawLine(l);
+            //fill circle
+            QPainterPath p;
+            p.addEllipse(r);
+            e->fillPath(p,m_fillBrush);
+        }
     }
 }
 
 
-alRectangleRenderer::alRectangleRenderer(alRectangle *rectPtr, const qreal borderThickness):
-    alRenderer(), m_rectangle(rectPtr)
+alRectangleRenderer::alRectangleRenderer(const qreal borderThickness):
+    alPolygonRenderer()
 {
     m_thickness = borderThickness;
     m_type = RenderType::Polygon;
@@ -157,54 +157,50 @@ void alRectangleRenderer::render(QPainter *e)
 {
     if(m_visible)
     {
-        m_rectVertex = alPolygonRenderer::updateVertices(m_rectangle);
-        renderMassCenter(e, m_rectangle, m_strokePen.color());
-        //render angle line
-        alVec2 v = alRot(m_rectangle->angle()) * alVec2(m_rectangle->width() / 2, 0);
-        QLineF l = QLineF(m_rectangle->position().x(), m_rectangle->position().y(),m_rectangle->position().x() + v.x(), m_rectangle->position().y() + v.y());
-        m_strokePen.setWidth(m_angleLineThickness);
-        e->setPen(m_strokePen);
-        e->drawLine(l);
-        m_strokePen.setWidth(m_thickness);
-        e->drawPolygon(m_rectVertex);
-        QPainterPath p;
-        p.addPolygon(m_rectVertex);
-        e->fillPath(p,m_fillBrush);
+        foreach (alRectangle* rectangle, m_rectangleList) {
+            m_rectVertex = updateVertices(rectangle);
+            renderMassCenter(e, rectangle, m_strokePen.color());
+            //render angle line
+            alVecter2 v = alRotation(rectangle->angle()) * alVecter2(rectangle->width() / 2, 0);
+            QLineF l = QLineF(rectangle->position().x(), rectangle->position().y(),rectangle->position().x() + v.x(), rectangle->position().y() + v.y());
+            m_strokePen.setWidth(m_angleLineThickness);
+            e->setPen(m_strokePen);
+            e->drawLine(l);
+            m_touchPen.setWidth(m_thickness);
+            m_strokePen.setWidth(m_thickness);
+            e->setPen(rectangle->isTouched() ? m_touchPen : m_strokePen);
+            e->drawPolygon(m_rectVertex);
+            QPainterPath p;
+            p.addPolygon(m_rectVertex);
+            e->fillPath(p,m_fillBrush);
+        }
     }
 }
-
-QPolygonF alPolygonRenderer::updateVertices(alPolygon* polygon)
-{
-    QPolygonF vertex;
-    foreach (alVec2 v, polygon->getActualVertices()) {
-        vertex.append(QPointF(v.x(), v.y()));
-    }
-    return vertex;
-}
-
 void alPolygonRenderer::render(QPainter *e)
 {
     if(m_visible)
     {
-        QPolygonF vertex = updateVertices(m_polygon);
-        e->setPen(m_strokePen);
-        e->drawLine(QLineF(m_polygon->position().x(), m_polygon->position().y(), vertex[0].x(),vertex[0].y()));
-        m_strokePen.setWidth(m_thickness);
-        e->drawPolygon(vertex);
-        QPainterPath p;
-        p.addPolygon(vertex);
-        e->fillPath(p,m_fillBrush);
+        foreach (alPolygon* polygon, m_polygonList) {
+            m_strokePen.setWidth(m_angleLineThickness);
+            QPolygonF vertex = updateVertices(polygon);
+            e->setPen(m_strokePen);
+            e->drawLine(QLineF(polygon->position().x(), polygon->position().y(), vertex[0].x(),vertex[0].y()));
+            m_strokePen.setWidth(m_thickness);
+            m_touchPen.setWidth(m_thickness);
+            e->setPen(polygon->isTouched() ? m_touchPen : m_strokePen);
+            e->drawPolygon(vertex);
+            QPainterPath p;
+            p.addPolygon(vertex);
+            e->fillPath(p,m_fillBrush);
+        }
     }
 }
-
-
-
 void alWallRenderer::render(QPainter *e)
 {
     if(m_visible)
     {
         foreach (alWall* w, m_wallList) {
-            QPolygonF pw = alPolygonRenderer::updateVertices(w);
+            QPolygonF pw = updateVertices(w);
             e->setPen(m_strokePen);
             e->drawPolygon(pw);
             QPainterPath p;
@@ -214,4 +210,9 @@ void alWallRenderer::render(QPainter *e)
     }
 }
 
+void alBodyRenderer::renderMassCenter(QPainter *e, alBody *body, const QColor &color)
+{
+        e->setPen(QPen(color, 4, Qt::SolidLine, Qt::RoundCap));
+        e->drawPoint(QPointF(body->position().x(), body->position().y()));
+}
 
