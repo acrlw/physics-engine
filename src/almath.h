@@ -127,6 +127,12 @@ public:
         m_x = x;
         m_y = y;
     }
+    inline void set(const alVecter2& v)
+    {
+        m_x = v.x();
+        m_y = v.y();
+    }
+
 private:
     float m_x;
     float m_y;
@@ -461,9 +467,15 @@ private:
     alVecter2 m_vector;
     alVecter2 m_origin;
 };
+
+static inline float alCross2(const alVecter2& l, const alVecter2& r)
+{
+    return l.x() * r.y() - r.x() * l.y();
+}
 ///3d vector cross product
 ///
-static inline alVecter3 alCrossProduct(const alVecter3& l, const alVecter3& r){
+static inline alVecter3 alCross3(const alVecter3& l, const alVecter3& r)
+{
     return alVecter3(l.y() * r.z() - l.z() * r.y(), l.z() * r.x() - l.x() * r.z(), l.x() * r.y() - l.y() * r.x());
 }
 static inline alVecter2 alPolarToCartesian(const float arc, const float length)

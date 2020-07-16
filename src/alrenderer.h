@@ -107,11 +107,12 @@ class alBodyRenderer : public alRenderer
     Q_OBJECT
 public:
     alBodyRenderer() {
-        m_touchPen  = QPen(QColor(255, 120, 0), m_thickness, Qt::SolidLine, Qt::RoundCap);
+        m_touchPen  = QPen(QColor(252, 3, 4), m_thickness, Qt::SolidLine, Qt::RoundCap);
     };
 
-    void renderMassCenter(QPainter * e, alBody *body, const QColor &color);
+    void renderPositionCenter(QPainter * e, alBody *body, const QColor &color);
 
+    void renderMassCenter(QPainter * e, alBody *body, const QColor &color = Qt::darkGray);
 protected:
     QPen m_touchPen;
 };
@@ -256,8 +257,8 @@ public:
     QPolygonF updateVertices(alPolygon* polygon)
     {
         QPolygonF vertex;
-        foreach (alVecter2 v, polygon->getActualVertices()) {
-            vertex.append(QPointF(v.x(), v.y()));
+        foreach (alVecter2 v, polygon->getRotatedVertices()) {
+            vertex.prepend(QPointF(v.x(), v.y()) + QPointF(polygon->position().x(), polygon->position().y()));
         }
         return vertex;
     }

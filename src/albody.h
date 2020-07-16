@@ -120,13 +120,33 @@ public:
         m_isTouched = isTouched;
     }
 
+    float inertia() const
+    {
+        return m_inertia;
+    }
+    void setInertia(float inertia)
+    {
+        m_inertia = inertia;
+    }
+
+    float density() const
+    {
+        return m_density;
+    }
+    void setDensity(float density)
+    {
+        m_density = density;
+    }
 protected:
     bool m_sleep;
     bool m_isTouched;
     float m_mass;
+    float m_density;
+    float m_inertia;
     float m_angle;
     float m_angularAcceleration;
     float m_angularVelocity;
+    alVecter2 m_massPosition;
     alVecter2 m_velocity;
     alVecter2 m_acceleration;
     alVecter2 m_position;
@@ -141,6 +161,7 @@ public:
         m_angle = angle;
         m_mass = m;
         m_type = BodyType::Circle;
+        m_massPosition = m_position;
     }
 
 
@@ -154,7 +175,6 @@ public:
         m_radius = radius;
     }
 
-
 private:
     float m_radius;
 };
@@ -162,6 +182,7 @@ class alPolygon : public alBody{
 public:
     alPolygon(){
         m_type = BodyType::Polygon;
+        m_isConvex = true;
     }
     std::vector<alVecter2> &vertices()
     {
@@ -172,18 +193,46 @@ public:
     {
         m_vertices = vertices;
     }
-    std::vector<alVecter2> getActualVertices()const
+    /// \brief getRotatedVertices
+    /// return the rotated vertices of polygon
+    /// \return
+    std::vector<alVecter2> getRotatedVertices()const
     {
         std::vector<alVecter2> actual;
         foreach (alVecter2 v, m_vertices) {
-            v = alRotation(m_angle) * v;
-            v += m_position;
-            actual.push_back(v);
+            alVecter2 va = alRotation(m_angle) * v;
+            actual.push_back(va);
         }
         return actual;
     }
+    void addVertex(const alVecter2& v){
+        m_vertices.push_back(v);
+        updateMassPosition();
+    }
+    inline alVecter2 triangleGravityPoint(const alVecter2& a1, const alVecter2& a2, const alVecter2& a3)const
+    {
+        return alVecter2(a1 + a2 + a3) * (1 / 3);
+    }
+    inline float triangleArea(const alVecter2& a1, const alVecter2& a2, const alVecter2& a3)const
+    {
+        return 0.5 * (alCross2(a1, a2) + alCross2(a2, a3) + alCross2(a1, a3));
+    }
 protected:
+    ///
+    /// \brief updateMassPosition
+    /// update the mass position
+    void updateMassPosition(){
+        if(m_vertices.size() >= 3)
+        {
+
+        }
+    }
+    ///
+    /// \brief m_vertices
+    /// the vertices come from when body stay the origin static status, which means this vertices will not participate the transformation
     std::vector<alVecter2> m_vertices;
+    bool m_isConvex;
+private:
 };
 
 class alRectangle : public alPolygon
@@ -216,20 +265,21 @@ public:
         m_height = height;
         updateVertices();
     }
-
+    void updateVertices()
+    {
+        m_vertices.clear();
+        addVertex(alVecter2(-m_width / 2, m_height / 2));
+        addVertex(alVecter2(-m_width / 2, -m_height / 2));
+        addVertex(alVecter2(m_width / 2, -m_height / 2));
+        addVertex(alVecter2(m_width / 2, m_height / 2));
+        addVertex(alVecter2(-m_width / 2, m_height / 2));
+        m_massPosition = m_position;
+    }
 protected:
     float m_width;
     float m_height;
 private:
-    void updateVertices()
-    {
-        m_vertices.clear();
-        m_vertices.push_back(alVecter2(-m_width / 2, m_height / 2));
-        m_vertices.push_back(alVecter2(-m_width / 2, -m_height / 2));
-        m_vertices.push_back(alVecter2(m_width / 2, -m_height / 2));
-        m_vertices.push_back(alVecter2(m_width / 2, m_height / 2));
-        m_vertices.push_back(alVecter2(-m_width / 2, m_height / 2));
-    }
+
 };
 class alWall : public alRectangle
 {
