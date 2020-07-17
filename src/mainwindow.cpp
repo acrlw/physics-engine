@@ -143,7 +143,7 @@ void MainWindow::paintEvent(QPaintEvent *e)
     //    m_measurer.render(&painter);
     bool contact = pccd1.detect();
     m_circle.setIsTouched(contact);
-    m_polygon2.setIsTouched(contact);
+    m_polygon.setIsTouched(contact);
 
 
     m_wallRenderer.render(&painter);
