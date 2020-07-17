@@ -212,7 +212,7 @@ public:
 
     inline bool isInArea(alCircle * circle, const QPointF& pos)
     {
-        return alVecter2(pos.x() - circle->position().x(), pos.y() - circle->position().y()).lengthSquare() <= circle->radius() * circle->radius();
+        return alVector2(pos.x() - circle->position().x(), pos.y() - circle->position().y()).lengthSquare() <= circle->radius() * circle->radius();
     }
 
 
@@ -257,7 +257,7 @@ public:
     QPolygonF updateVertices(alPolygon* polygon)
     {
         QPolygonF vertex;
-        foreach (alVecter2 v, polygon->getRotatedVertices()) {
+        foreach (alVector2 v, polygon->getRotatedVertices()) {
             vertex.prepend(QPointF(v.x(), v.y()) + QPointF(polygon->position().x(), polygon->position().y()));
         }
         return vertex;

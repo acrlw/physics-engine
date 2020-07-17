@@ -12,7 +12,7 @@ class alWorld
 
 public:
     alWorld(){
-        m_gravity = alVecter2(0, alGravity);
+        m_gravity = alVector2(0, alGravity);
         m_airFrictionCoefficient = alAirFrictionCoefficient;
         m_planeFrictionCoefficient = alFrictionCoefficient;
     }
@@ -49,12 +49,12 @@ public:
     }
 
 
-    alVecter2 gravity() const
+    alVector2 gravity() const
     {
         return m_gravity;
     }
 
-    void setGravity(const alVecter2 &gravity)
+    void setGravity(const alVector2 &gravity)
     {
         m_gravity = gravity;
     }
@@ -83,7 +83,7 @@ public:
 private:
     std::vector<alBody *> m_bodyList;
     std::vector<alWall *> m_wallList;
-    alVecter2 m_gravity;
+    alVector2 m_gravity;
     float m_airFrictionCoefficient;
     float m_planeFrictionCoefficient;
 

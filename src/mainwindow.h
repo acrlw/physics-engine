@@ -34,15 +34,15 @@ protected:
 private:
     Ui::MainWindow *ui;
 
-//    alCircle m_circle;
-//    alCircle m_circle2;
+    alCircle m_circle;
+    //alCircle m_circle2;
 //    alRectangle m_rectangle;
 //    alRectangle m_rectangle2;
 //    alRectangleRenderer m_rectangleRenderer;
-//    alCircleRenderer m_circleRenderer;
-//    alPolygonCircleCollisionDetector m_polygonCircleCD;
-//    alPolygonPolygonCollisionDetector m_polygonPolygonCD;
-//    alCircleCircleCollisionDetector m_circleCircleCD;
+    alCircleRenderer m_circleRenderer;
+    alPolygonCircleCollisionDetector pccd1, pccd2;
+    alPolygonPolygonCollisionDetector ppcd1;
+    //alCircleCircleCollisionDetector cccd1;
 //    alMeasurer m_measurer;
 
     QTimer m_timer;

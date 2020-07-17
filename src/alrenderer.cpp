@@ -129,7 +129,7 @@ void alCircleRenderer::render(QPainter *e)
             //draw angle line
             m_strokePen.setWidth(m_angleLineThickness);
             e->setPen(m_strokePen);
-            alVecter2 v = alRotation(circle->angle()) * alVecter2(circle->radius(), 0);
+            alVector2 v = alRotation(circle->angle()) * alVector2(circle->radius(), 0);
             QLineF l = QLineF(circle->position().x(), circle->position().y(),circle->position().x() + v.x(), circle->position().y() + v.y());
             e->drawLine(l);
             //fill circle
@@ -156,7 +156,7 @@ void alRectangleRenderer::render(QPainter *e)
             m_rectVertex = updateVertices(rectangle);
             renderPositionCenter(e, rectangle, m_strokePen.color());
             //render angle line
-            alVecter2 v = alRotation(rectangle->angle()) * alVecter2(rectangle->width() / 2, 0);
+            alVector2 v = alRotation(rectangle->angle()) * alVector2(rectangle->width() / 2, 0);
             QLineF l = QLineF(rectangle->position().x(), rectangle->position().y(),rectangle->position().x() + v.x(), rectangle->position().y() + v.y());
             m_strokePen.setWidth(m_angleLineThickness);
             e->setPen(m_strokePen);
