@@ -18,27 +18,27 @@ public:
         Circle,
         Polygon
     };
-    inline alVecter2& velocity()
+    inline alVector2& velocity()
     {
         return m_velocity;
     }
-    inline void setVelocity(const alVecter2 &velocity)
+    inline void setVelocity(const alVector2 &velocity)
     {
         m_velocity = velocity;
     }
-    inline alVecter2& acceleration()
+    inline alVector2& acceleration()
     {
         return m_acceleration;
     }
-    inline void setAcceleration(const alVecter2 &acceleration)
+    inline void setAcceleration(const alVector2 &acceleration)
     {
         m_acceleration = acceleration;
     }
-    inline alVecter2& position()
+    inline alVector2& position()
     {
         return m_position;
     }
-    inline void setPosition(const alVecter2 &position)
+    inline void setPosition(const alVector2 &position)
     {
         m_position = position;
     }
@@ -146,10 +146,10 @@ protected:
     float m_angle;
     float m_angularAcceleration;
     float m_angularVelocity;
-    alVecter2 m_massPosition;
-    alVecter2 m_velocity;
-    alVecter2 m_acceleration;
-    alVecter2 m_position;
+    alVector2 m_massPosition;
+    alVector2 m_velocity;
+    alVector2 m_acceleration;
+    alVector2 m_position;
     BodyType m_type;
 };
 class alCircle: public alBody{
@@ -184,36 +184,36 @@ public:
         m_type = BodyType::Polygon;
         m_isConvex = true;
     }
-    std::vector<alVecter2> &vertices()
+    std::vector<alVector2> &vertices()
     {
         return m_vertices;
     }
 
-    void setVertices(const std::vector<alVecter2> &vertices)
+    void setVertices(const std::vector<alVector2> &vertices)
     {
         m_vertices = vertices;
     }
     /// \brief getRotatedVertices
     /// return the rotated vertices of polygon
     /// \return
-    std::vector<alVecter2> getRotatedVertices()const
+    std::vector<alVector2> getRotatedVertices()const
     {
-        std::vector<alVecter2> actual;
-        foreach (alVecter2 v, m_vertices) {
-            alVecter2 va = alRotation(m_angle) * v;
+        std::vector<alVector2> actual;
+        foreach (alVector2 v, m_vertices) {
+            alVector2 va = alRotation(m_angle) * v;
             actual.push_back(va);
         }
         return actual;
     }
-    void addVertex(const alVecter2& v){
+    void addVertex(const alVector2& v){
         m_vertices.push_back(v);
         updateMassPosition();
     }
-    inline alVecter2 triangleGravityPoint(const alVecter2& a1, const alVecter2& a2, const alVecter2& a3)const
+    inline alVector2 triangleGravityPoint(const alVector2& a1, const alVector2& a2, const alVector2& a3)const
     {
-        return alVecter2(a1 + a2 + a3) * (1 / 3);
+        return alVector2(a1 + a2 + a3) * (1 / 3);
     }
-    inline float triangleArea(const alVecter2& a1, const alVecter2& a2, const alVecter2& a3)const
+    inline float triangleArea(const alVector2& a1, const alVector2& a2, const alVector2& a3)const
     {
         return 0.5 * (alCross2(a1, a2) + alCross2(a2, a3) + alCross2(a1, a3));
     }
@@ -230,7 +230,7 @@ protected:
     ///
     /// \brief m_vertices
     /// the vertices come from when body stay the origin static status, which means this vertices will not participate the transformation
-    std::vector<alVecter2> m_vertices;
+    std::vector<alVector2> m_vertices;
     bool m_isConvex;
 private:
 };
@@ -268,11 +268,11 @@ public:
     void updateVertices()
     {
         m_vertices.clear();
-        addVertex(alVecter2(-m_width / 2, m_height / 2));
-        addVertex(alVecter2(-m_width / 2, -m_height / 2));
-        addVertex(alVecter2(m_width / 2, -m_height / 2));
-        addVertex(alVecter2(m_width / 2, m_height / 2));
-        addVertex(alVecter2(-m_width / 2, m_height / 2));
+        addVertex(alVector2(-m_width / 2, m_height / 2));
+        addVertex(alVector2(-m_width / 2, -m_height / 2));
+        addVertex(alVector2(m_width / 2, -m_height / 2));
+        addVertex(alVector2(m_width / 2, m_height / 2));
+        addVertex(alVector2(-m_width / 2, m_height / 2));
         m_massPosition = m_position;
     }
 protected:
