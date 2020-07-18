@@ -9,17 +9,15 @@ public:
     alCollisionDetector();
 
 
-    alVector2 minimunTranslationVector()const
-    {
-        return m_minimunTranslationVector;
-    }
 
-    void setMinimunTranslationVector(const alVector2 &minimunTranslationVector)
-    {
-        m_minimunTranslationVector = minimunTranslationVector;
-    }
+    alVector2 minimumPenetration() const;
+
+    float penetrateLength() const;
+
+    virtual bool detect() = 0;
 protected:
-    alVector2 m_minimunTranslationVector;
+    float m_penetrateLength = 0;
+    alVector2 m_minimumPenetration;
 };
 class alPolygonCircleCollisionDetector : public alCollisionDetector
 {
@@ -27,14 +25,25 @@ public:
     alPolygonCircleCollisionDetector() {}
     ~alPolygonCircleCollisionDetector();
 
-    bool detect(QPainter *painter) ;
-    alCircle *circle() const;
-    void setCircle(alCircle *circle);
+    bool detect() override;
+    alCircle *circle() const
+    {
+        return m_circle;
+    }
+    void setCircle(alCircle *circle)
+    {
+        m_circle = circle;
+    }
 
-    alPolygon *polygon() const;
-    void setPolygon(alPolygon *polygon);
+    alPolygon *polygon() const
+    {
+        return m_polygon;
+    }
+    void setPolygon(alPolygon *polygon)
+    {
+        m_polygon = polygon;
+    }
 
-    alVector2 penetrate;
 protected:
 private:
     alCircle *m_circle;
@@ -45,12 +54,24 @@ class alCircleCircleCollisionDetector : public alCollisionDetector
 public:
     alCircleCircleCollisionDetector() {}
     ~alCircleCircleCollisionDetector();
-    bool detect() ;
-    alCircle *circle1() const;
-    void setCircle1(alCircle *circle1);
+    bool detect() override;
+    alCircle *circle1() const
+    {
+        return m_circle1;
+    }
+    void setCircle1(alCircle *circle1)
+    {
+        m_circle1 = circle1;
+    }
 
-    alCircle *circle2() const;
-    void setCircle2(alCircle *circle2);
+    alCircle *circle2() const
+    {
+        return m_circle2;
+    }
+    void setCircle2(alCircle *circle2)
+    {
+        m_circle2 = circle2;
+    }
 
 protected:
 private:
@@ -63,25 +84,39 @@ class alPolygonPolygonCollisionDetector : public alCollisionDetector
 public:
     alPolygonPolygonCollisionDetector() {}
     ~alPolygonPolygonCollisionDetector();
-    bool detect(QPainter *painter) ;
+
+    bool detect() override;
     ///
     /// \brief satDetection
     /// \param p1
     /// \param p2
     /// separating axis theorem colision detection
-    bool satDetection(QPainter *painter, alPolygon * p1, alPolygon * p2);
-    int contact = 1;
-    QLineF penetrateLine;
-    float penetrateLength = 0;
-    alPolygon *polygon1() const;
-    void setPolygon1(alPolygon *polygon1);
 
-    alPolygon *polygon2() const;
-    void setPolygon2(alPolygon *polygon2);
+    alPolygon *polygon1() const
+    {
+        return m_polygon1;
+    }
+    void setPolygon1(alPolygon *polygon1)
+    {
+        m_polygon1 = polygon1;
+    }
+
+    alPolygon *polygon2() const
+    {
+        return m_polygon2;
+    }
+    void setPolygon2(alPolygon *polygon2)
+    {
+        m_polygon2 = polygon2;
+    }
+
 
 protected:
 private:
+    bool satDetection(alPolygon * p1, alPolygon * p2);
+
     alPolygon *m_polygon1;
     alPolygon *m_polygon2;
+
 };
 #endif // ALCOLLISIONDETECTOR_H

@@ -72,15 +72,13 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    m_polygon.addVertex(alVector2(4, 2) * 30);
-    m_polygon.addVertex(alVector2(2, 4) * 30);
-    m_polygon.addVertex(alVector2(-2, 4) * 30);
-    m_polygon.addVertex(alVector2(-4, 2) * 30);
-    m_polygon.addVertex(alVector2(-4, -2) * 30);
-    m_polygon.addVertex(alVector2(-2, -4) * 30);
-    m_polygon.addVertex(alVector2(2, -4) * 30);
-    m_polygon.addVertex(alVector2(4, -2) * 30);
-    m_polygon.addVertex(alVector2(4, 2) * 30);
+    m_polygon.addVertex(alVector2(4, 3) * 30);
+    m_polygon.addVertex(alVector2(-2, 8) * 30);
+    m_polygon.addVertex(alVector2(-6, 2) * 30);
+    m_polygon.addVertex(alVector2(-4, -5) * 30);
+    m_polygon.addVertex(alVector2(-2, -6) * 30);
+    m_polygon.addVertex(alVector2(7, -4) * 30);
+    m_polygon.addVertex(alVector2(4, 3) * 30);
     m_polygon.setPosition(alVector2(300, 460));
     m_polygon.setSleep(false);
 
@@ -125,15 +123,15 @@ void MainWindow::processObjectMovement()
         alVector2 dp1 = mousePos - m_polygon.position();
         alVector2 dp2 = mousePos - m_circle.position();
         alVector2 dp3 = mousePos - m_polygon2.position();
-        if(dp1.length() < 10)
+        if(dp1.length() < 20)
         {
             m_polygon.position() = mousePos;
         }
-        if(dp2.length() < 10)
+        if(dp2.length() < 20)
         {
             m_circle.position() = mousePos;
         }
-        if(dp3.length() < 10)
+        if(dp3.length() < 20)
         {
             m_polygon2.position() = mousePos;
         }
@@ -149,9 +147,9 @@ void MainWindow::paintEvent(QPaintEvent *e)
     //    m_rectangleRenderer.render(&painter);
     //    m_measurer.render(&painter);
     QPen line(Qt::darkBlue, 1, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
-    bool contact1 = pccd1.detect(&painter);
-    bool contact3 = pccd2.detect(&painter);
-    bool contact2 = ppcd1.detect(&painter);
+    bool contact1 = pccd1.detect();
+    bool contact3 = pccd2.detect();
+    bool contact2 = ppcd1.detect();
     int circleTouch = 0;
     int polygonTouch = 0;
     int polygonTouch2 = 0;
@@ -171,6 +169,21 @@ void MainWindow::paintEvent(QPaintEvent *e)
     m_circle.setIsTouched(circleTouch);
     m_polygon.setIsTouched(polygonTouch);
     m_polygon2.setIsTouched(polygonTouch2);
+    if(contact2)
+    {
+        m_polygon.position() += ppcd1.minimumPenetration();
+        m_polygon2.position() -= ppcd1.minimumPenetration();
+    }
+    if(contact1)
+    {
+        m_polygon.position() += pccd1.minimumPenetration();
+        m_circle.position() -= pccd1.minimumPenetration();
+    }
+    if(contact3)
+    {
+        m_polygon2.position() += pccd2.minimumPenetration();
+        m_circle.position() -= pccd2.minimumPenetration();
+    }
     m_wallRenderer.render(&painter);
     m_polygonRenderer.render(&painter);
     m_circleRenderer.render(&painter);
