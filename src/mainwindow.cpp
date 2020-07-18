@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     //    m_measurer.setAccelerationColor(Qt::darkCyan);
 
         m_circle.setPosition(alVector2(200, 200));
-        m_circle.setRadius(40);
+        m_circle.setRadius(80);
         m_circle.setAngle(0);
         m_circle.setSleep(false);
 
@@ -72,33 +72,40 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    m_polygon.addVertex(alVector2(4, 2) * 10);
-    m_polygon.addVertex(alVector2(2, 4) * 10);
-    m_polygon.addVertex(alVector2(-2, 4) * 10);
-    m_polygon.addVertex(alVector2(-4, 2) * 10);
-    m_polygon.addVertex(alVector2(-4, -2) * 10);
-    m_polygon.addVertex(alVector2(-2, -4) * 10);
-    m_polygon.addVertex(alVector2(2, -4) * 10);
-    m_polygon.addVertex(alVector2(4, -2) * 10);
-    m_polygon.addVertex(alVector2(4, 2) * 10);
+    m_polygon.addVertex(alVector2(4, 2) * 30);
+    m_polygon.addVertex(alVector2(2, 4) * 30);
+    m_polygon.addVertex(alVector2(-2, 4) * 30);
+    m_polygon.addVertex(alVector2(-4, 2) * 30);
+    m_polygon.addVertex(alVector2(-4, -2) * 30);
+    m_polygon.addVertex(alVector2(-2, -4) * 30);
+    m_polygon.addVertex(alVector2(2, -4) * 30);
+    m_polygon.addVertex(alVector2(4, -2) * 30);
+    m_polygon.addVertex(alVector2(4, 2) * 30);
     m_polygon.setPosition(alVector2(300, 460));
     m_polygon.setSleep(false);
 
-//    m_polygon2.addVertex(alVector2(4, 8) * 5);
-//    m_polygon2.addVertex(alVector2(-4, 8) * 5);
-//    m_polygon2.addVertex(alVector2(-4, -8) * 5);
-//    m_polygon2.addVertex(alVector2(4, -8) * 5);
-//    m_polygon2.addVertex(alVector2(4, 8) * 5);
-//    m_polygon2.setPosition(alVector2(480, 680));
-//    m_polygon2.setSleep(false);
+    m_polygon2.addVertex(alVector2(4, 8) * 20);
+    m_polygon2.addVertex(alVector2(-4, 8) * 20);
+    m_polygon2.addVertex(alVector2(-4, -8) * 20);
+    m_polygon2.addVertex(alVector2(4, -8) * 20);
+    m_polygon2.addVertex(alVector2(4, 8) * 20);
+    m_polygon2.setPosition(alVector2(480, 680));
+    m_polygon2.setSleep(false);
 
     m_polygonRenderer.setThickness(2);
     m_polygonRenderer.setAngleLineThickness(2);
     m_polygonRenderer.polygonList().append(&m_polygon);
-   // m_polygonRenderer.polygonList().append(&m_polygon2);
+    m_polygonRenderer.polygonList().append(&m_polygon2);
 
     pccd1.setPolygon(&m_polygon);
     pccd1.setCircle(&m_circle);
+
+
+    pccd2.setPolygon(&m_polygon2);
+    pccd2.setCircle(&m_circle);
+
+    ppcd1.setPolygon1(&m_polygon);
+    ppcd1.setPolygon2(&m_polygon2);
 
     m_wallRenderer.wallList().append(&w1);
     m_wallRenderer.wallList().append(&w2);
@@ -141,11 +148,29 @@ void MainWindow::paintEvent(QPaintEvent *e)
     painter.setRenderHint(QPainter::Antialiasing);
     //    m_rectangleRenderer.render(&painter);
     //    m_measurer.render(&painter);
-    bool contact = pccd1.detect();
-    m_circle.setIsTouched(contact);
-    m_polygon.setIsTouched(contact);
-
-
+    QPen line(Qt::darkBlue, 1, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+    bool contact1 = pccd1.detect(&painter);
+    bool contact3 = pccd2.detect(&painter);
+    bool contact2 = ppcd1.detect(&painter);
+    int circleTouch = 0;
+    int polygonTouch = 0;
+    int polygonTouch2 = 0;
+    if(contact1){
+        circleTouch++;
+        polygonTouch++;
+    }
+    if(contact2){
+        polygonTouch++;
+        polygonTouch2++;
+    }
+    if(contact3)
+    {
+        polygonTouch2++;
+        circleTouch++;
+    }
+    m_circle.setIsTouched(circleTouch);
+    m_polygon.setIsTouched(polygonTouch);
+    m_polygon2.setIsTouched(polygonTouch2);
     m_wallRenderer.render(&painter);
     m_polygonRenderer.render(&painter);
     m_circleRenderer.render(&painter);
