@@ -3,6 +3,7 @@
 
 #include <albody.h>
 #include <QPainter>
+#include <alrenderer.h>
 class alCollisionDetector
 {
 public:
@@ -14,7 +15,6 @@ public:
 
     float penetrateLength() const;
 
-    virtual bool detect() = 0;
 protected:
     float m_penetrateLength = 0;
     alVector2 m_minimumPenetration;
@@ -25,7 +25,7 @@ public:
     alPolygonCircleCollisionDetector() {}
     ~alPolygonCircleCollisionDetector();
 
-    bool detect() override;
+    bool detect() ;
     alCircle *circle() const
     {
         return m_circle;
@@ -44,17 +44,20 @@ public:
         m_polygon = polygon;
     }
 
+    alVector2 contactPoint() const;
+
 protected:
 private:
     alCircle *m_circle;
     alPolygon *m_polygon;
+    alVector2 m_contactPoint;
 };
 class alCircleCircleCollisionDetector : public alCollisionDetector
 {
 public:
     alCircleCircleCollisionDetector() {}
     ~alCircleCircleCollisionDetector();
-    bool detect() override;
+    bool detect() ;
     alCircle *circle1() const
     {
         return m_circle1;
@@ -85,7 +88,7 @@ public:
     alPolygonPolygonCollisionDetector() {}
     ~alPolygonPolygonCollisionDetector();
 
-    bool detect() override;
+    bool detect(QPainter *painter) ;
     ///
     /// \brief satDetection
     /// \param p1
@@ -111,12 +114,16 @@ public:
     }
 
 
+    alVector2 contactPoint() const;
+
 protected:
 private:
-    bool satDetection(alPolygon * p1, alPolygon * p2);
+    bool satDetection(QPainter *painter, alPolygon *p1, alPolygon *p2);
 
     alPolygon *m_polygon1;
     alPolygon *m_polygon2;
-
+    alVector2 m_contactPoint;
+    alVector2 m_st;
+    alVector2 m_ed;
 };
 #endif // ALCOLLISIONDETECTOR_H

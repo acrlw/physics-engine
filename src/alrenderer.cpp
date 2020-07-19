@@ -171,12 +171,21 @@ void alRectangleRenderer::render(QPainter *e)
         }
     }
 }
+void alPolygonRenderer::renderMassCenter(QPainter *e, alBody *body, const QColor &color)
+{
+    alPolygon * polygon = static_cast<alPolygon*>(body);
+    e->setPen(QPen(color, 6, Qt::SolidLine, Qt::RoundCap));
+    alVector2 mp = alRotation(polygon->angle()) * polygon->massPosition() + polygon->position();
+    e->drawPoint(QPointF(mp.x(), mp.y()));
+}
+
 void alPolygonRenderer::render(QPainter *e)
 {
     if(m_visible)
     {
         foreach (alPolygon* polygon, m_polygonList) {
             renderPositionCenter(e, polygon, m_strokePen.color());
+            renderMassCenter(e, polygon);
             m_strokePen.setWidth(m_angleLineThickness);
             QPolygonF vertex = updateVertices(polygon);
             e->setPen(m_strokePen);

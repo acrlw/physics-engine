@@ -6,18 +6,19 @@
 #include <vector>
 #include <QDebug>
 
+enum BodyType{
+    Circle,
+    Polygon,
+    Wall
+};
 
 class alBody
 {
 public:
-    alBody(const float m = 1): m_sleep(true), m_isTouched(false), m_mass(m), m_angle(0) , m_angularAcceleration(0), m_angularVelocity(0)
+    alBody(const float m = 1): m_sleep(true), m_isTouched(false), m_mass(m), m_angle(0) , m_angularAcceleration(0), m_angularVelocity(0), m_torque(0)
     {
 
     }
-    enum BodyType{
-        Circle,
-        Polygon
-    };
     inline alVector2& velocity()
     {
         return m_velocity;
@@ -86,16 +87,38 @@ public:
     void update(){
         if(!m_sleep)
         {
-            m_position += m_velocity;
-            m_angle += m_angularVelocity;
-            m_velocity += m_acceleration * alDeltaTime;
-            m_angularVelocity += m_angularAcceleration * alDeltaTime;
+            alVector2 pos = m_position;
+            alVector2 velocity = m_velocity;
+            alVector2 acceleration;
+            float angularAcceleraion = m_angularAcceleration;
+            float angularVelocity = m_angularVelocity;
+            float angle = m_angle;
 
-            if(m_velocity.lengthSquare() < alStopThreshold)// if it did reach the deadline
-                m_velocity.set(0., 0.);
 
-            if(m_angularVelocity * m_angularVelocity < alStopThreshold)
-                m_angularVelocity = 0;
+
+            if(velocity.lengthSquare() < alStopThreshold)// if it did reach the deadline
+                velocity.set(0., 0.);
+
+            if(angularVelocity * angularVelocity < alStopThreshold)
+                angularVelocity = 0;
+
+            acceleration = alVector2(0, 6) + m_forces / m_mass;
+            angularAcceleraion = m_torque / m_inertia;
+
+            velocity += acceleration * alDeltaTime;
+            angularVelocity += angularAcceleraion * alDeltaTime;
+
+            pos += velocity;
+            angle += angularVelocity;
+
+            m_position = pos;
+            m_angle = angle;
+            m_velocity = velocity;
+            m_angularVelocity = angularVelocity;
+
+
+            m_forces.set(0 ,0);
+            m_torque = 0;
         }
 
     }
@@ -137,12 +160,51 @@ public:
     {
         m_density = density;
     }
+
+    alVector2 massPosition() const
+    {
+        return m_massPosition;
+    }
+
+    void setMassPosition(const alVector2 &massPosition)
+    {
+        m_massPosition = massPosition;
+    }
+
+    float torque() const
+    {
+        return m_torque;
+    }
+    void setTorque(float torque)
+    {
+        m_torque = torque;
+    }
+
+    alVector2 forces() const
+    {
+        return m_forces;
+    }
+    void setForces(const alVector2 &forces)
+    {
+        m_forces = forces;
+    }
+
+    void clearForce()
+    {
+        m_forces.set(0, 0);
+    }
+
+    void addForce(const alVector2& force)
+    {
+        m_forces += force;
+    }
 protected:
     bool m_sleep;
     bool m_isTouched;
     float m_mass;
     float m_density;
     float m_inertia;
+    float m_torque;
     float m_angle;
     float m_angularAcceleration;
     float m_angularVelocity;
@@ -150,6 +212,8 @@ protected:
     alVector2 m_velocity;
     alVector2 m_acceleration;
     alVector2 m_position;
+    alVector2 m_forces;
+
     BodyType m_type;
 };
 class alCircle: public alBody{
@@ -162,9 +226,14 @@ public:
         m_mass = m;
         m_type = BodyType::Circle;
         m_massPosition = m_position;
+        m_inertia = m_mass * m_radius * m_radius * 0.5;
     }
 
-
+    inline void setPosition(const alVector2 &position)
+    {
+        m_position = position;
+        m_massPosition = m_position;
+    }
     float radius() const
     {
         return m_radius;
@@ -173,6 +242,7 @@ public:
     void setRadius(float radius)
     {
         m_radius = radius;
+        m_inertia = m_mass * m_radius * m_radius * 0.5;
     }
 
 private:
@@ -211,11 +281,11 @@ public:
     }
     inline alVector2 triangleGravityPoint(const alVector2& a1, const alVector2& a2, const alVector2& a3)const
     {
-        return alVector2(a1 + a2 + a3) * (1 / 3);
+        return alVector2(a1 + a2 + a3) / 3;
     }
     inline float triangleArea(const alVector2& a1, const alVector2& a2, const alVector2& a3)const
     {
-        return 0.5 * (alCross2(a1, a2) + alCross2(a2, a3) + alCross2(a1, a3));
+        return abs(alCross2(a1 - a2, a1 - a3)) / 2;
     }
 protected:
     ///
@@ -224,7 +294,22 @@ protected:
     void updateMassPosition(){
         if(m_vertices.size() >= 3)
         {
-
+            if(m_type == BodyType::Polygon)
+            {
+                alVector2 pos;
+                float area = 0;
+                for(int i = 0;i < m_vertices.size() - 1; i++)
+                {
+                    float a = triangleArea(alVector2(0, 0), m_vertices[i], m_vertices[i + 1]);
+                    alVector2 p = triangleGravityPoint(alVector2(0, 0), m_vertices[i], m_vertices[i + 1]);
+                    pos += p * a;
+                    area += a;
+                }
+                if(abs(area) > 0)
+                    pos /= area;
+                m_massPosition = pos;
+                updateInertia();
+            }
         }
     }
     ///
@@ -233,6 +318,22 @@ protected:
     std::vector<alVector2> m_vertices;
     bool m_isConvex;
 private:
+
+    void updateInertia()
+    {
+        float sum1 = 0.0;
+        float sum2 = 0.0;
+        for(int i = 0;i < m_vertices.size() - 1; i++)
+        {
+            alVector2 n1 = m_vertices[i] - m_massPosition;
+            alVector2 n2 = m_vertices[i + 1] - m_massPosition;
+            float cross = abs(alCross2(n1, n2));
+            float dot = n2 * n2 + n2 * n1 + n1 * n1;
+            sum1 += cross * dot;
+            sum2 += cross;
+        }
+        m_inertia = (m_mass / 6) * sum1 / sum2;
+    }
 };
 
 class alRectangle : public alPolygon
@@ -241,6 +342,8 @@ public:
     alRectangle(const float width = 50, const float height = 50):
         alPolygon(), m_width(width), m_height(height)
     {
+        m_type = BodyType::Polygon;
+        m_massPosition = m_position;
         updateVertices();
     }
 
@@ -274,19 +377,26 @@ public:
         addVertex(alVector2(m_width / 2, m_height / 2));
         addVertex(alVector2(-m_width / 2, m_height / 2));
         m_massPosition = m_position;
+        updateInertia();
     }
 protected:
     float m_width;
     float m_height;
 private:
+    void updateInertia()
+    {
+        m_inertia = m_mass * (m_width * m_width + m_height * m_height) / 12;
+    }
 
 };
 class alWall : public alRectangle
 {
 public:
     alWall(const float elasticCoefficient = 0.8, const float width = 40): alRectangle(), m_elasticCoefficient(elasticCoefficient) {
+        m_type = BodyType::Wall;
         m_width = width;
         m_height = width;
+        m_massPosition = m_position;
     }
 
     float elasticCoefficient() const

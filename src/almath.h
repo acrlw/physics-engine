@@ -69,6 +69,9 @@ public:
     inline float operator * (const alVector2& v) const {
         return m_x * v.x() + m_y * v.y();
     }
+    inline alVector2 operator / (const float f) const{
+        return alVector2(m_x / f, m_y / f);
+    }
     inline void operator += (const alVector2& v) {
         m_x += v.x();
         m_y += v.y();
@@ -80,6 +83,10 @@ public:
     inline void operator *= (const float f) {
         m_x *= f;
         m_y *= f;
+    }
+    inline void operator /= (const float f){
+        m_x /= f;
+        m_y /= f;
     }
     ///
     /// \brief length
