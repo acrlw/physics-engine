@@ -81,14 +81,15 @@ MainWindow::MainWindow(QWidget *parent)
     m_polygon.addVertex(alVector2(4, 3) * 30);
     m_polygon.setPosition(alVector2(300, 460));
     m_polygon.setSleep(false);
+    m_polygon.setAngle(36);
 
-    m_polygon2.addVertex(alVector2(4, 8) * 20);
-    m_polygon2.addVertex(alVector2(-4, 8) * 20);
-    m_polygon2.addVertex(alVector2(-4, -8) * 20);
-    m_polygon2.addVertex(alVector2(4, -8) * 20);
-    m_polygon2.addVertex(alVector2(4, 8) * 20);
+    m_polygon2.addVertex(alVector2(4, -4) * 20);
+    m_polygon2.addVertex(alVector2(-4, -4) * 20);
+    m_polygon2.addVertex(alVector2(0, 8) * 20);
+    m_polygon2.addVertex(alVector2(4, -4) * 20);
     m_polygon2.setPosition(alVector2(480, 680));
     m_polygon2.setSleep(false);
+    m_polygon2.setAngle(78);
 
     m_polygonRenderer.setThickness(2);
     m_polygonRenderer.setAngleLineThickness(2);

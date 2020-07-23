@@ -14,7 +14,6 @@ public:
 
     float penetrateLength() const;
 
-    virtual bool detect() = 0;
 protected:
     float m_penetrateLength = 0;
     alVector2 m_minimumPenetration;
@@ -25,7 +24,7 @@ public:
     alPolygonCircleCollisionDetector() {}
     ~alPolygonCircleCollisionDetector();
 
-    bool detect() override;
+    bool detect();
     alCircle *circle() const
     {
         return m_circle;
@@ -54,7 +53,7 @@ class alCircleCircleCollisionDetector : public alCollisionDetector
 public:
     alCircleCircleCollisionDetector() {}
     ~alCircleCircleCollisionDetector();
-    bool detect() override;
+    bool detect();
     alCircle *circle1() const
     {
         return m_circle1;
@@ -85,7 +84,7 @@ public:
     alPolygonPolygonCollisionDetector() {}
     ~alPolygonPolygonCollisionDetector();
 
-    bool detect() override;
+    bool detect();
     ///
     /// \brief satDetection
     /// \param p1
@@ -111,9 +110,9 @@ public:
     }
 
 
+    int satDetection(alPolygon *p1, alPolygon *p2);
 protected:
 private:
-    bool satDetection(alPolygon * p1, alPolygon * p2);
 
     alPolygon *m_polygon1;
     alPolygon *m_polygon2;
