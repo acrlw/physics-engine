@@ -29,6 +29,16 @@ alPolygonCircleCollisionDetector::~alPolygonCircleCollisionDetector()
 
 bool alPolygonCircleCollisionDetector::detect()
 {
+//    int offset = 200;
+//    QPen line(Qt::darkBlue, 1, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+//    QPen linemin(Qt::darkGray, 4, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+//    QPen linepenetrate(Qt::red, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+//    QPen dot1(Qt::darkYellow, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+//    QPen dot2(Qt::darkGreen, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+//    QPen dotmax(Qt::red, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+//    QPen dotmin(Qt::blue, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+//    QPen dotmax2(Qt::green, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+//    QPen dotmin2(Qt::magenta, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     if(m_polygon == nullptr || m_circle == nullptr)
         return false;
     ///Attention the body order!
@@ -44,15 +54,38 @@ bool alPolygonCircleCollisionDetector::detect()
     float shortestLength = 0;
     alVector2 shortestST;
     alVector2 shortestED;
+    //qDebug () << "size: " << b1vertices.size();
     for(int i = 0; i < b1vertices.size() - 1; i++)
     {
         alVector2 edge = b1vertices[i + 1] - b1vertices[i];
         alVector2 perpendicular = alVector2(edge.y(), -edge.x()).getNormalizedVector();
+
+
+//                alVector2 mid = (b1vertices[i + 1] + b1vertices[i]) * 0.5;
+//                alVector2 s = perpendicular * offset + mid;
+
+//                alVector2 st = m_polygon->position() + mid;
+//                alVector2 ed = m_polygon->position() + s;
+
+//                painter->setPen(line);
+//                painter->drawLine(st.x(), st.y(), ed.x(), ed.y());
+        //qDebug () << "edge: " << edge.x() << ", " << edge.y();
         float b1_min = (b1vertices[0]) * (perpendicular), b1_max = (b1vertices[0]) * (perpendicular);
         for(int j = 0;j < b1vertices.size(); j++)
         {
             float temp = (b1vertices[j]) * (perpendicular);
 
+            //            //emphasize vertices
+//            alVector2 tempVector = perpendicular * temp;
+//            tempVector += m_polygon->position();
+//            alVector2 tempP = b1vertices[j] + m_polygon->position();
+//            painter->setPen(dot1);
+//            painter->drawPoint(tempP.x(), tempP.y());
+//            painter->drawPoint(tempVector.x(), tempVector.y());
+
+//            painter->setPen(line);
+//            painter->drawLine(tempVector.x(), tempVector.y(), tempP.x(), tempP.y());
+            //            //emphasize end
             if(b1_min > temp)
                 b1_min = temp;
             if(b1_max < temp)
@@ -71,14 +104,36 @@ bool alPolygonCircleCollisionDetector::detect()
         alVector2 minVector2 = perpendicular * b2_min;
         alVector2 maxVector2 = perpendicular * b2_max;
 
-        if(b1_max > b2_min || b2_max < b1_min){
+
+        if((b2_min > b1_min && b2_min < b1_max) || (b2_max > b1_min && b2_max < b1_max) ||
+                (b1_min > b2_min && b1_max < b2_max) || (b2_min > b1_min && b1_max > b2_max))
             contactAxis++;
-        }
         float dt1 = b1_max - b2_min;
         float dt2 = b2_max - b1_min;
         float min = abs(dt1) > abs(dt2) ? dt2 : dt1;
 
 
+        minVector1 += m_polygon->position();
+        maxVector1 += m_polygon->position();
+        minVector2 += m_polygon->position();
+        maxVector2 += m_polygon->position();
+//        painter->setPen(dotmin);
+//        painter->drawPoint(minVector1.x(), minVector1.y());
+//        painter->setPen(dotmax);
+//        painter->drawPoint(maxVector1.x(), maxVector1.y());
+//        painter->setPen(dotmin2);
+//        painter->drawPoint(minVector2.x(), minVector2.y());
+//        painter->setPen(dotmax2);
+//        painter->drawPoint(maxVector2.x(), maxVector2.y());
+//        painter->setPen(linemin);
+//        if(abs(dt1) > abs(dt2))
+//        {
+//            painter->drawLine(maxVector2.x(), maxVector2.y(), minVector1.x(), minVector1.y());
+//        }
+//        else
+//        {
+//            painter->drawLine(maxVector1.x(), maxVector1.y(), minVector2.x(), minVector2.y());
+//        }
         if(i == 0)
         {
             shortestLength = abs(min);
@@ -117,7 +172,6 @@ bool alPolygonCircleCollisionDetector::detect()
         {
             minimumDistance = temp;
             minimumIndex = 0;
-            continue;
         }
         if(minimumDistance > temp)
         {
@@ -128,13 +182,28 @@ bool alPolygonCircleCollisionDetector::detect()
     //projection axis of circle
     alVector2 edge = b1vertices[minimumIndex] - circle.position();
     edge.normalize();
+//    edge = alRotation(90) * edge;
+
+//    alVector2 st = b1vertices[minimumIndex] + m_polygon->position();
+//    alVector2 ed = m_circle->position();
+//    painter->setPen(line);
+//    painter->drawLine(st.x(), st.y(), ed.x(), ed.y());
+
 
     float b1_min = (b1vertices[0]) * (edge), b1_max = (b1vertices[0]) * (edge);
     for(int j = 0;j < b1vertices.size(); j++)
     {
         float temp = (b1vertices[j]) * (edge);
 
+//        alVector2 tempVector = edge * temp;
+//        tempVector += m_polygon->position();
+//        alVector2 tempP = b1vertices[j] + m_polygon->position();
+//        painter->setPen(dot1);
+//        painter->drawPoint(tempP.x(), tempP.y());
+//        painter->drawPoint(tempVector.x(), tempVector.y());
 
+//        painter->setPen(line);
+//        painter->drawLine(tempVector.x(), tempVector.y(), tempP.x(), tempP.y());
 
         if(b1_min > temp)
             b1_min = temp;
@@ -152,15 +221,35 @@ bool alPolygonCircleCollisionDetector::detect()
     alVector2 minVector2 = edge * b2_min;
     alVector2 maxVector2 = edge * b2_max;
 
-
+    minVector1 += m_polygon->position();
+    maxVector1 += m_polygon->position();
+    minVector2 += m_polygon->position();
+    maxVector2 += m_polygon->position();
+//    painter->setPen(dotmin);
+//    painter->drawPoint(minVector1.x(), minVector1.y());
+//    painter->setPen(dotmax);
+//    painter->drawPoint(maxVector1.x(), maxVector1.y());
+//    painter->setPen(dotmin2);
+//    painter->drawPoint(minVector2.x(), minVector2.y());
+//    painter->setPen(dotmax2);
+//    painter->drawPoint(maxVector2.x(), maxVector2.y());
 
 
     float dt1 = b1_max - b2_min;
     float dt2 = b2_max - b1_min;
     float min = abs(dt1) > abs(dt2) ? dt2 : dt1;
-    if(b2_max > b1_min || b1_max < b2_min)
+    if((b2_min > b1_min && b2_min < b1_max) || (b2_max > b1_min && b2_max < b1_max))
         contactAxis++;
 
+//    painter->setPen(linemin);
+//    if(abs(dt1) > abs(dt2))
+//    {
+//        painter->drawLine(maxVector2.x(), maxVector2.y(), minVector1.x(), minVector1.y());
+//    }
+//    else
+//    {
+//        painter->drawLine(maxVector1.x(), maxVector1.y(), minVector2.x(), minVector2.y());
+//    }
 
     if(shortestLength == 0)
     {
@@ -191,9 +280,11 @@ bool alPolygonCircleCollisionDetector::detect()
             shortestED = alVector2(minVector2.x(), minVector2.y());
         }
     }
-
+    //qDebug () << "contact: " << contactAxis;
     if(contactAxis == polygon.vertices().size()){
         m_minimumPenetration = shortestED - shortestST;
+//        painter->setPen(linepenetrate);
+//        painter->drawLine(shortestST.x(), shortestST.y(), shortestED.x(), shortestED.y());
         alVector2 positionDirection = m_circle->position() - m_polygon->position();
         if(m_minimumPenetration * positionDirection / abs(m_minimumPenetration * positionDirection) == 1)
             m_minimumPenetration *= -1;
@@ -201,11 +292,6 @@ bool alPolygonCircleCollisionDetector::detect()
         return true;
     }
     return false;
-}
-
-alVector2 alPolygonCircleCollisionDetector::contactPoint() const
-{
-    return m_contactPoint;
 }
 
 alCircleCircleCollisionDetector::~alCircleCircleCollisionDetector()
@@ -244,43 +330,39 @@ alPolygonPolygonCollisionDetector::~alPolygonPolygonCollisionDetector()
     m_polygon2 = nullptr;
 }
 
-bool alPolygonPolygonCollisionDetector::detect(QPainter * painter)
+bool alPolygonPolygonCollisionDetector::detect()
 {
     if(m_polygon1 == nullptr || m_polygon1 == nullptr)
         return false;
     m_penetrateLength = 0;
     m_minimumPenetration.set(0, 0);
-    bool contact1 = satDetection(painter, m_polygon1, m_polygon2);
-    bool contact2 = satDetection(painter, m_polygon2, m_polygon1);
+    int contact1 = satDetection(m_polygon1, m_polygon2);
+    int contact2 = satDetection(m_polygon2, m_polygon1);
+    //qDebug () << "shortest length: " << m_penetrateLength;
 
-    if(contact1 && contact2)
+    if(contact1 == m_polygon1->vertices().size() - 1 && contact2 == m_polygon2->vertices().size() - 1)
     {
         alVector2 positionDirection = m_polygon2->position() - m_polygon1->position();
         if(m_minimumPenetration * positionDirection / abs(m_minimumPenetration * positionDirection) == 1)
             m_minimumPenetration *= -1;
-//        alMeasurer m;
-//        alVector2 st = m_st ;
-//        alVector2 ed = m_ed ;
-//        alVector2 st = shortestST + p2->position();
-//        alVector2 ed = shortestED + p2->position();
-//        qDebug () << "st: " << st.x() << ", " << st.y();
-//        qDebug () << "ed: " << ed.x() << ", " << ed.y();
-//        painter->setPen(QPen(Qt::darkYellow, 8, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin));
-//        painter->drawPoint(st.x(), st.y());
-//        painter->drawPoint(ed.x(), ed.y());
-//        painter->setPen(QPen(Qt::darkBlue, 2, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin));
-//        painter->drawLine(st.x(), st.y(), ed.x(), ed.y());
-//        alVector2 st = alRotation(m_polygon1->angle()) * shortestST + m_polygon1->position();
-//        alVector2 ed = shortestED + m_polygon1->position();
-//        m.renderArrow(painter, QPoint(st.x(), st.y()), QPoint(ed.x(), ed.y()), "", Qt::red);
         return true;
     }
+
     return false;
 }
 
-bool alPolygonPolygonCollisionDetector::satDetection(QPainter * painter, alPolygon *p1, alPolygon *p2)
+int alPolygonPolygonCollisionDetector::satDetection(alPolygon *p1, alPolygon *p2)
 {
-    QPen linemin(Qt::red, 2, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+    //    int offset = 680;
+    //    QPen line(Qt::darkBlue, 1, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+    //    QPen linemin(Qt::darkGray, 4, Qt::DashDotLine, Qt::RoundCap, Qt::RoundJoin);
+    //    QPen linepenetrate(Qt::red, 5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    //    QPen dot1(Qt::darkYellow, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    //    QPen dot2(Qt::darkGreen, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    //    QPen dotmax(Qt::red, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    //    QPen dotmin(Qt::blue, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    //    QPen dotmax2(Qt::green, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    //    QPen dotmin2(Qt::magenta, 8, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     std::vector<alVector2> b1vertices = p1->getRotatedVertices();
     std::vector<alVector2> b2vertices = p2->getRotatedVertices();
     alVector2 relativePosition = p2->position() - p1->position();
@@ -292,13 +374,32 @@ bool alPolygonPolygonCollisionDetector::satDetection(QPainter * painter, alPolyg
     {
         alVector2 edge = b1vertices[i + 1] - b1vertices[i];
         alVector2 perpendicular = alVector2(edge.y(), -edge.x()).getNormalizedVector();
+        //        //assistant perpendicular line drawing
+        //        alVector2 mid = (b1vertices[i + 1] + b1vertices[i]) * 0.5;
+        //        alVector2 s = perpendicular * offset + mid;
 
+        //        alVector2 st = p1->position() + mid;
+        //        alVector2 ed = p1->position() + s;
+
+        //        painter->setPen(line);
+        //        painter->drawLine(st.x(), st.y(), ed.x(), ed.y());
+        //        //assistant end draw
         float b1_min = (b1vertices[0]) * (perpendicular), b1_max = (b1vertices[0]) * (perpendicular);
         for(int j = 0;j < b1vertices.size(); j++)
         {
             float temp = (b1vertices[j]) * (perpendicular);
 
+            //            //emphasize vertices
+            //            alVector2 tempVector = perpendicular * temp;
+            //            tempVector += p1->position();
+            //            alVector2 tempP = b1vertices[j] + p1->position();
+            //            painter->setPen(dot1);
+            //            painter->drawPoint(tempP.x(), tempP.y());
+            //            painter->drawPoint(tempVector.x(), tempVector.y());
 
+            //            painter->setPen(line);
+            //            painter->drawLine(tempVector.x(), tempVector.y(), tempP.x(), tempP.y());
+            //            //emphasize end
             if(b1_min > temp)
                 b1_min = temp;
             if(b1_max < temp)
@@ -329,12 +430,42 @@ bool alPolygonPolygonCollisionDetector::satDetection(QPainter * painter, alPolyg
         float dt2 = b2_max - b1_min;
         float min = abs(dt1) > abs(dt2) ? dt2 : dt1;
 
-        if(b1_max > b2_min || b2_max < b1_min){
+        //        painter->setPen(dotmin);
+        //        painter->drawPoint(minVector1.x(), minVector1.y());
+        //        painter->setPen(dotmax);
+        //        painter->drawPoint(maxVector1.x(), maxVector1.y());
+        //        painter->setPen(dotmin2);
+        //        painter->drawPoint(minVector2.x(), minVector2.y());
+        //        painter->setPen(dotmax2);
+        //        painter->drawPoint(maxVector2.x(), maxVector2.y());
+        //        painter->setPen(linemin);
+        //        if(abs(dt1) > abs(dt2))
+        //        {
+        //            painter->drawLine(maxVector2.x(), maxVector2.y(), minVector1.x(), minVector1.y());
+        //        }
+        //        else
+        //        {
+        //            painter->drawLine(maxVector1.x(), maxVector1.y(), minVector2.x(), minVector2.y());
+        //        }
+
+
+        if((b2_min > b1_min && b2_min < b1_max) || (b2_max > b1_min && b2_max < b1_max) ||
+                (b1_min > b2_min && b1_max < b2_max) || (b2_min > b1_min && b1_max > b2_max))
             contactAxis++;
-        }
+
+        //        painter->setPen(linemin);
+        //        if(abs(dt1) > abs(dt2))
+        //        {
+        //            painter->drawLine(maxVector2.x(), maxVector2.y(), minVector1.x(), minVector1.y());
+        //        }
+        //        else
+        //        {
+        //            painter->drawLine(maxVector1.x(), maxVector1.y(), minVector2.x(), minVector2.y());
+        //        }
+
         if(i == 0)
         {
-            shortestLength = min;
+            shortestLength = abs(min);
             if(abs(dt1) > abs(dt2))
             {
                 shortestST = alVector2(maxVector2.x(), maxVector2.y());
@@ -350,53 +481,37 @@ bool alPolygonPolygonCollisionDetector::satDetection(QPainter * painter, alPolyg
         {
             if(shortestLength > abs(dt2))
             {
-                shortestLength = dt2;
+                shortestLength = abs(dt2);
                 shortestST = alVector2(maxVector2.x(), maxVector2.y());
                 shortestED = alVector2(minVector1.x(), minVector1.y());
             }
             if(shortestLength > abs(dt1))
             {
-                shortestLength = dt1;
+                shortestLength = abs(dt1);
                 shortestST = alVector2(maxVector1.x(), maxVector1.y());
                 shortestED = alVector2(minVector2.x(), minVector2.y());
             }
         }
     }
-    if(contactAxis == p1->vertices().size() - 1)
+    //qDebug () <<"polygon edge:" << p1->vertices().size() - 1 << "   contact: " << contactAxis;
+    if(m_penetrateLength == 0)
     {
-        if(m_penetrateLength == 0)
-        {
-            m_contactPoint = shortestST;
-            m_minimumPenetration = shortestED - shortestST;
-            m_penetrateLength = shortestLength;
-            m_st = shortestST;
-            m_ed = shortestED;
-        }
-        else
-        {
-            if(m_penetrateLength > shortestLength)
-            {
-                m_contactPoint = shortestST;
-                m_minimumPenetration = shortestED - shortestST;
-                m_penetrateLength = shortestLength;
-                m_st = shortestST;
-                m_ed = shortestED;
-                //alMeasurer m;
-//                alVector2 st = shortestST + p1->position();
-//                alVector2 ed = shortestED + p1->position();
-                //m.renderArrow(painter, QPoint(st.x(), st.y()), QPoint(ed.x(), ed.y()), "", Qt::red);
-            }
-        }
-
-        return true;
+        m_minimumPenetration = shortestED - shortestST;
+        m_penetrateLength = shortestLength;
+        //            painter->setPen(linepenetrate);
+        //            painter->drawLine(shortestST.x(), shortestST.y(), shortestED.x(), shortestED.y());
     }
     else
-        return false;
-}
-
-alVector2 alPolygonPolygonCollisionDetector::contactPoint() const
-{
-    return m_contactPoint;
+    {
+        if(m_penetrateLength > shortestLength)
+        {
+            //                painter->setPen(linepenetrate);
+            //                painter->drawLine(shortestST.x(), shortestST.y(), shortestED.x(), shortestED.y());
+            m_minimumPenetration = shortestED - shortestST;
+            m_penetrateLength = shortestLength;
+        }
+    }
+    return contactAxis;
 }
 
 

@@ -2,7 +2,7 @@
 #define ALSETTINGS_H
 
 
-#define alDeltaTime 0.04f
+#define alDeltaTime 0.06f
 #define alTimerInterval 15
 #define alStopThreshold 0.0219f
 #define alLengthForceRatio 5.0f

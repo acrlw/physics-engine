@@ -41,7 +41,7 @@ private:
 //    alRectangleRenderer m_rectangleRenderer;
     alCircleRenderer m_circleRenderer;
     alPolygonCircleCollisionDetector pccd1, pccd2, pccd3, pccd4;
-    alPolygonPolygonCollisionDetector ppcd1,ppcd2,ppcd3,ppcd4;
+    alPolygonPolygonCollisionDetector ppcd1,ppcd2,ppcd3,ppcd4, ppcdObject;
     alPolygonCircleCollisionDetector pccdObject;
 
     //alCircleCircleCollisionDetector cccd1;

@@ -102,7 +102,7 @@ public:
             if(angularVelocity * angularVelocity < alStopThreshold)
                 angularVelocity = 0;
 
-            acceleration = alVector2(0, 6) + m_forces / m_mass;
+            acceleration = alVector2(0, 10) + m_forces / m_mass;
             angularAcceleraion = m_torque / m_inertia;
 
             velocity += acceleration * alDeltaTime;

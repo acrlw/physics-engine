@@ -3,7 +3,6 @@
 
 #include <albody.h>
 #include <QPainter>
-#include <alrenderer.h>
 class alCollisionDetector
 {
 public:
@@ -25,7 +24,7 @@ public:
     alPolygonCircleCollisionDetector() {}
     ~alPolygonCircleCollisionDetector();
 
-    bool detect() ;
+    bool detect();
     alCircle *circle() const
     {
         return m_circle;
@@ -44,20 +43,17 @@ public:
         m_polygon = polygon;
     }
 
-    alVector2 contactPoint() const;
-
 protected:
 private:
     alCircle *m_circle;
     alPolygon *m_polygon;
-    alVector2 m_contactPoint;
 };
 class alCircleCircleCollisionDetector : public alCollisionDetector
 {
 public:
     alCircleCircleCollisionDetector() {}
     ~alCircleCircleCollisionDetector();
-    bool detect() ;
+    bool detect();
     alCircle *circle1() const
     {
         return m_circle1;
@@ -88,7 +84,7 @@ public:
     alPolygonPolygonCollisionDetector() {}
     ~alPolygonPolygonCollisionDetector();
 
-    bool detect(QPainter *painter) ;
+    bool detect();
     ///
     /// \brief satDetection
     /// \param p1
@@ -114,16 +110,12 @@ public:
     }
 
 
-    alVector2 contactPoint() const;
-
+    int satDetection(alPolygon *p1, alPolygon *p2);
 protected:
 private:
-    bool satDetection(QPainter *painter, alPolygon *p1, alPolygon *p2);
 
     alPolygon *m_polygon1;
     alPolygon *m_polygon2;
-    alVector2 m_contactPoint;
-    alVector2 m_st;
-    alVector2 m_ed;
+
 };
 #endif // ALCOLLISIONDETECTOR_H
