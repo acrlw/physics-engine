@@ -230,7 +230,6 @@ public:
 
 public slots:
     void render(QPainter *e)override;
-
 private:
     QVector<alCircle *> m_circleList;
 };
@@ -253,7 +252,7 @@ public:
     {
         m_polygonList = polygonList;
     }
-public:
+    void renderMassCenter(QPainter *e, alBody *body, const QColor &color = Qt::darkGray);
     QPolygonF updateVertices(alPolygon* polygon)
     {
         QPolygonF vertex;

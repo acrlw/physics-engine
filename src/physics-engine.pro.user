@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.12.3, 2020-07-23T12:49:33. -->
+<!-- Written by QtCreator 4.12.3, 2020-07-28T01:12:58. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -309,8 +309,8 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">physics-engine2</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:D:/Qt Projects/physics-engine/src/physics-engine.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">D:/Qt Projects/physics-engine/src/physics-engine.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:D:/physics-engine-test/physics-engine-test/src/physics-engine.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">D:/physics-engine-test/physics-engine-test/src/physics-engine.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>

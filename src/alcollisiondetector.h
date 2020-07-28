@@ -11,20 +11,112 @@ public:
 
 
     alVector2 minimumPenetration() const;
-
+    virtual bool detect() = 0;
     float penetrateLength() const;
 
 protected:
     float m_penetrateLength = 0;
     alVector2 m_minimumPenetration;
 };
+///
+/// \brief
+/// This class is used for Minkowski sum calculation
+class alSimplex{
+public:
+
+    std::vector<alVector2>& vertices()
+    {
+        return m_vertices;
+    }
+
+    bool containOrigin();
+    alVector2 getLastVertex()const{
+        return m_vertices[m_vertices.size() - 1];
+    }
+
+private:
+    std::vector<alVector2> m_vertices;
+};
+class alSimplexEdge
+{
+public:
+    alSimplexEdge() {}
+    alVector2 p1() const;
+    void setP1(const alVector2 &p1);
+
+    alVector2 p2() const;
+    void setP2(const alVector2 &p2);
+
+private:
+    alVector2 m_p1;
+    alVector2 m_p2;
+};
+///
+/// \brief
+/// Use Gilbert–Johnson–Keerthi distance algorithm to detect the collision status of two bodies
+class alGJKCollisionDetector : public alCollisionDetector
+{
+
+public:
+    alGJKCollisionDetector(alPolygon *body1 = nullptr, alPolygon *body2 = nullptr): alCollisionDetector(), m_body1(body1), m_body2(body2){};
+
+    alPolygon *body1() const
+    {
+        return m_body1;
+    }
+
+    void setBody1(alPolygon *body1)
+    {
+        m_body1 = body1;
+    }
+
+    alPolygon *body2() const
+    {
+        return m_body2;
+    }
+
+    void setBody2(alPolygon *body2)
+    {
+        m_body2 = body2;
+    }
+
+    bool detectCollision(QPainter * painter);
+
+    std::pair<alVector2, alVector2> contactPair() const
+    {
+        return m_contactPair;
+    }
+
+    alVector2 penetration() const
+    {
+        return m_penetration;
+    }
+
+    alVector2 findFarthestPoint(alPolygon *body1, const alVector2& direction);
+    alVector2 support(alPolygon *body1, alPolygon *body2, const alVector2& direction);
+    void doEPA(alPolygon *body1, alPolygon *body2, alSimplex &simplex);
+
+    bool detect()override;
+    alVector2 getDirection(alSimplex &simplex, bool towardsOrigin);
+    bool doGJKDetection(alPolygon *body1, alPolygon *body2);
+    alSimplex findClosestEdge(alSimplex simplex);
+private:
+    alPolygon *m_body1;
+    alPolygon *m_body2;
+    std::pair<alVector2, alVector2> m_contactPair;
+    alVector2 m_penetration;
+    alSimplex m_simplex;
+};
+///
+/// \brief
+/// Use Separating Axis Theorm algorithm to detect the collision status of two bodies
 class alPolygonCircleCollisionDetector : public alCollisionDetector
 {
 public:
     alPolygonCircleCollisionDetector() {}
     ~alPolygonCircleCollisionDetector();
 
-    bool detect();
+    bool detect()override;
     alCircle *circle() const
     {
         return m_circle;
@@ -53,7 +145,7 @@ class alCircleCircleCollisionDetector : public alCollisionDetector
 public:
     alCircleCircleCollisionDetector() {}
     ~alCircleCircleCollisionDetector();
-    bool detect();
+    bool detect()override;
     alCircle *circle1() const
     {
         return m_circle1;
@@ -84,12 +176,7 @@ public:
     alPolygonPolygonCollisionDetector() {}
     ~alPolygonPolygonCollisionDetector();
 
-    bool detect();
-    ///
-    /// \brief satDetection
-    /// \param p1
-    /// \param p2
-    /// separating axis theorem colision detection
+    bool detect()override;
 
     alPolygon *polygon1() const
     {
@@ -110,6 +197,9 @@ public:
     }
 
 
+    ///
+    /// \brief
+    /// separating axis theorem colision detection
     int satDetection(alPolygon *p1, alPolygon *p2);
 protected:
 private:

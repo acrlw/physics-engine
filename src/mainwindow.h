@@ -40,8 +40,10 @@ private:
 //    alRectangle m_rectangle2;
 //    alRectangleRenderer m_rectangleRenderer;
     alCircleRenderer m_circleRenderer;
-    alPolygonCircleCollisionDetector pccd1, pccd2;
-    alPolygonPolygonCollisionDetector ppcd1;
+    alPolygonCircleCollisionDetector pccd1, pccd2, pccd3, pccd4;
+    alPolygonPolygonCollisionDetector ppcd1,ppcd2,ppcd3,ppcd4, ppcdObject;
+    alPolygonCircleCollisionDetector pccdObject;
+    alGJKCollisionDetector gjk;
     //alCircleCircleCollisionDetector cccd1;
 //    alMeasurer m_measurer;
 
@@ -50,7 +52,7 @@ private:
     bool m_drag = false;
     bool m_drag2 = false;
     bool m_mousePress = false;
-
+    QPointF m_mouseStart;
     alPolygon m_polygon;
     alPolygon m_polygon2;
     alPolygonRenderer m_polygonRenderer;

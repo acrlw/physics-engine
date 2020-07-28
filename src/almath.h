@@ -69,6 +69,9 @@ public:
     inline float operator * (const alVector2& v) const {
         return m_x * v.x() + m_y * v.y();
     }
+    inline alVector2 operator / (const float f) const{
+        return alVector2(m_x / f, m_y / f);
+    }
     inline void operator += (const alVector2& v) {
         m_x += v.x();
         m_y += v.y();
@@ -81,8 +84,12 @@ public:
         m_x *= f;
         m_y *= f;
     }
+    inline void operator /= (const float f){
+        m_x /= f;
+        m_y /= f;
+    }
     ///
-    /// \brief length
+    /// \brief
     /// return the length of the vector
     /// \return
     ///
@@ -132,7 +139,15 @@ public:
         m_x = v.x();
         m_y = v.y();
     }
-
+    inline void negate()
+    {
+        m_x = -m_x;
+        m_y = -m_y;
+    }
+    inline const alVector2 perpendicularVector()
+    {
+        return alVector2(-m_y, m_x);
+    }
 private:
     float m_x;
     float m_y;
@@ -248,6 +263,12 @@ public:
         float r = alFastInverseSqrt(m_x * m_x + m_y * m_y + m_z * m_z);
         return alVector3(m_x, m_y, m_z) * r;
     }
+    inline void negate()
+    {
+        m_x = -m_x;
+        m_y = -m_y;
+        m_z = -m_z;
+    }
 private:
     float m_x;
     float m_y;
@@ -313,12 +334,9 @@ public:
     inline void setColumn2(const alVector2 &column2){
         m_column2 = column2;
     }
-    inline alMatrix2x2 transpose(){
-        alVector2 column1(m_column1.x() , m_column2.x());
-        alVector2 column2(m_column1.y() , m_column2.y());
-        m_column1 = column1;
-        m_column2 = column2;
-        return alMatrix2x2(column1, column2);
+    inline void transpose(){
+        m_column1 = alVector2(m_column1.x() , m_column2.x());
+        m_column2 = alVector2(m_column1.y() , m_column2.y());
     }
 private:
     alVector2 m_column1;

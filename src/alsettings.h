@@ -10,5 +10,8 @@
 #define alGravity 9.8f
 #define alFrictionCoefficient 0.8f
 #define alAirFrictionCoefficient 0.8f
+#define alEPAIteration 20
+#define alGJKIteration 20
+#define alEPAEpsilon 0.00001f
 
 #endif // ALSETTINGS_H
