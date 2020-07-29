@@ -17,7 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     albody.cpp \
-    alcollisiondetector.cpp \
+    alcollision.cpp \
     almath.cpp \
     alrenderer.cpp \
     alworld.cpp \
@@ -26,7 +26,7 @@ SOURCES += \
 
 HEADERS += \
     albody.h \
-    alcollisiondetector.h \
+    alcollision.h \
     almath.h \
     alrenderer.h \
     alsettings.h \

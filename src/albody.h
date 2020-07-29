@@ -213,20 +213,23 @@ protected:
     alVector2 m_acceleration;
     alVector2 m_position;
     alVector2 m_forces;
-
+    std::vector<alVector2> m_vertices;
+    float m_radius;
+    bool m_isConvex;
     BodyType m_type;
 };
 class alCircle: public alBody{
 
 public:
     alCircle(const float radius = 120, const float angle = 0, const float m = 1):
-        alBody(), m_radius(radius)
+        alBody()
     {
         m_angle = angle;
         m_mass = m;
         m_type = BodyType::Circle;
         m_massPosition = m_position;
         m_inertia = m_mass * m_radius * m_radius * 0.5;
+        m_radius = radius;
     }
 
     inline void setPosition(const alVector2 &position)
@@ -245,8 +248,6 @@ public:
         m_inertia = m_mass * m_radius * m_radius * 0.5;
     }
 
-private:
-    float m_radius;
 };
 class alPolygon : public alBody{
 public:
@@ -314,10 +315,9 @@ protected:
     ///
     /// \brief
     /// the vertices come from when body stay the origin static status, which means this vertices will not participate the transformation
-    std::vector<alVector2> m_vertices;
-    bool m_isConvex;
-private:
 
+
+private:
     void updateInertia()
     {
         float sum1 = 0.0;

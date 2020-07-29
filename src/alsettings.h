@@ -13,5 +13,5 @@
 #define alEPAIteration 20
 #define alGJKIteration 20
 #define alEPAEpsilon 0.00001f
-#define alEPAScale 0.6f
+#define alEPAScale 1.0000009f
 #endif // ALSETTINGS_H

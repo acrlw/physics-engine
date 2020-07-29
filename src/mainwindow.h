@@ -10,7 +10,7 @@
 #include <QMouseEvent>
 #include <albody.h>
 #include <alrenderer.h>
-#include <alcollisiondetector.h>
+#include <alcollision.h>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -40,10 +40,7 @@ private:
 //    alRectangle m_rectangle2;
 //    alRectangleRenderer m_rectangleRenderer;
     alCircleRenderer m_circleRenderer;
-    alPolygonCircleCollisionDetector pccd1, pccd2, pccd3, pccd4;
-    alPolygonPolygonCollisionDetector ppcd1,ppcd2,ppcd3,ppcd4, ppcdObject;
-    alPolygonCircleCollisionDetector pccdObject;
-    alGJKCollisionDetector gjk;
+
     //alCircleCircleCollisionDetector cccd1;
 //    alMeasurer m_measurer;
 
