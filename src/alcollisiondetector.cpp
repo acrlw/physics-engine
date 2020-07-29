@@ -409,6 +409,11 @@ bool alGJKCollisionDetector::doGJKDetection(alPolygon *body1, alPolygon *body2)
     polygon2.position() = direction;
 
     //start gjk
+    //scale vertices in order to optimize the epa iteration result
+    foreach(alVector2 v, polygon1.vertices())
+        v *= alEPAScale;
+    foreach(alVector2 v, polygon2.vertices())
+        v *= alEPAScale;
     int iteration = 0;
     simplex.vertices().push_back(support(&polygon1, &polygon2, direction));
     direction.negate();
@@ -421,7 +426,7 @@ bool alGJKCollisionDetector::doGJKDetection(alPolygon *body1, alPolygon *body2)
         } else {
             if(simplex.containOrigin())
             {
-                doEPA(body1, body2, simplex);
+                doEPA(&polygon1, &polygon2, simplex);
                 return true;
             }
             else
@@ -438,11 +443,45 @@ void alGJKCollisionDetector::doEPA(alPolygon *body1, alPolygon *body2, alSimplex
 {
     if(simplex.vertices().size() == 3)
     {
-        //qDebug () << "epa iteration start";
+        //epa iteration start
         int iteration = 0;
-        while(iteration <= alGJKIteration)
+        while(iteration <= alEPAIteration)
         {
+            alSimplex edge = findClosestEdge(simplex);
 
+            alVector2 normal = getDirection(edge, false).getNormalizedVector();
+
+            float originToEdge = abs(normal * edge.vertices()[0]);
+
+            alVector2 p = support(body1, body2, normal);
+
+            float d = p * normal;
+
+            float difference = d - originToEdge;
+
+            //optimization
+            float even = sqrt(d * originToEdge);
+            if (difference < alEPAEpsilon) {
+                m_minimumPenetration = normal * even;
+            } else {
+                //check if we have already saved the same Minkowski Difference
+                bool isExisted = false;
+                foreach(alVector2 v, simplex.vertices())
+                {
+                    if(v == p)
+                    {
+                        isExisted = true;
+                        break;
+                    }
+                }
+                if(isExisted)
+                {
+                    m_minimumPenetration = normal * even;
+                    return;
+                }
+                else
+                    simplex.insertVertex(edge, p);
+            }
             iteration++;
         }
     }
@@ -475,38 +514,40 @@ alVector2 alGJKCollisionDetector::getDirection(alSimplex &simplex, bool towardsO
     alVector2 perpendicularOfAB = ab.perpendicularVector();
     result = perpendicularOfAB;
     if(ao * perpendicularOfAB < 0 && towardsOrigin)
-        result = result * -1;
+        result.negate();
+    else if(ao * perpendicularOfAB > 0 && !towardsOrigin)
+        result.negate();
     return result;
 }
 alSimplex alGJKCollisionDetector::findClosestEdge(alSimplex simplex)
 {
-        int minimumDistance = INT_MAX;
-        int minimumIndex1 = 0;
-        int minimumIndex2 = 0;
-        for(int i = 0;i < simplex.vertices().size(); i++)
-        {
-            int j = i == simplex.vertices().size() - 1 ? 0 : i + 1;
-            alVector2 a = simplex.vertices()[i];
-            alVector2 b = simplex.vertices()[j];
-            alVector2 ab = b - a; // a -> b
-            alVector2 ao = a * -1;
-            alVector2 perpendicularOfAB = ab.perpendicularVector();
-            alVector2 e = perpendicularOfAB;
-            if(ao * perpendicularOfAB < 0)//perpendicular vector point to origin
-                e = e * -1;
-            alVector2 projection = e.getNormalizedVector() * (ao * e);
+    int minimumDistance = INT_MAX;
+    int minimumIndex1 = 0;
+    int minimumIndex2 = 0;
+    for(int i = 0;i < simplex.vertices().size(); i++)
+    {
+        int j = i == simplex.vertices().size() - 1 ? 0 : i + 1;
+        alVector2 a = simplex.vertices()[i];
+        alVector2 b = simplex.vertices()[j];
+        alVector2 ab = b - a; // a -> b
+        alVector2 ao = a * -1;
+        alVector2 perpendicularOfAB = ab.perpendicularVector();
+        alVector2 e = perpendicularOfAB;
+        if(ao * perpendicularOfAB < 0)//perpendicular vector point to origin
+            e = e * -1;
+        alVector2 projection = e.getNormalizedVector() * (ao * e);
 
-            if(minimumDistance > projection.length())
-            {
-                minimumIndex1 = i;
-                minimumIndex2 = j;
-                minimumDistance = projection.length();
-            }
+        if(minimumDistance > projection.length())
+        {
+            minimumIndex1 = i;
+            minimumIndex2 = j;
+            minimumDistance = projection.length();
         }
-        alSimplex result;
-        result.vertices().push_back(simplex.vertices()[minimumIndex1]);
-        result.vertices().push_back(simplex.vertices()[minimumIndex2]);
-        return result;
+    }
+    alSimplex result;
+    result.vertices().push_back(simplex.vertices()[minimumIndex1]);
+    result.vertices().push_back(simplex.vertices()[minimumIndex2]);
+    return result;
 }
 bool alSimplex::containOrigin(){
     if(m_vertices.size() == 3)
@@ -538,22 +579,13 @@ bool alSimplex::containOrigin(){
 
 }
 
-alVector2 alSimplexEdge::p1() const
+void alSimplex::insertVertex(alSimplex &edge, const alVector2 &vertex)
 {
-    return m_p1;
+    //insert into vertices list before the index
+    int targetIndex = 0;
+    for(int i = 0;i < m_vertices.size();i++)
+        if((m_vertices[i] == edge.vertices()[0] || m_vertices[i] == edge.vertices()[1]) && targetIndex < i)
+            targetIndex = i;
+    m_vertices.insert(m_vertices.begin() + targetIndex, vertex);
 }
 
-void alSimplexEdge::setP1(const alVector2 &p1)
-{
-    m_p1 = p1;
-}
-
-alVector2 alSimplexEdge::p2() const
-{
-    return m_p2;
-}
-
-void alSimplexEdge::setP2(const alVector2 &p2)
-{
-    m_p2 = p2;
-}

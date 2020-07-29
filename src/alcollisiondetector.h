@@ -33,24 +33,11 @@ public:
     alVector2 getLastVertex()const{
         return m_vertices[m_vertices.size() - 1];
     }
-
+    void insertVertex(alSimplex &edge, const alVector2& vertex);
 private:
     std::vector<alVector2> m_vertices;
 };
-class alSimplexEdge
-{
-public:
-    alSimplexEdge() {}
-    alVector2 p1() const;
-    void setP1(const alVector2 &p1);
 
-    alVector2 p2() const;
-    void setP2(const alVector2 &p2);
-
-private:
-    alVector2 m_p1;
-    alVector2 m_p2;
-};
 ///
 /// \brief
 /// Use Gilbert–Johnson–Keerthi distance algorithm to detect the collision status of two bodies

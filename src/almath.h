@@ -88,6 +88,10 @@ public:
         m_x /= f;
         m_y /= f;
     }
+    inline bool operator ==(const alVector2& v)
+    {
+        return m_x == v.x() && m_y == v.y();
+    }
     ///
     /// \brief
     /// return the length of the vector
@@ -212,6 +216,10 @@ public:
         m_x *= f;
         m_y *= f;
         m_z *= f;
+    }
+    inline bool operator ==(const alVector3& v)
+    {
+        return m_x == v.x() && m_y == v.y() && m_z == v.z();
     }
     inline float lengthSquare()
     {
