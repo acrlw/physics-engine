@@ -34,10 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
     //    m_measurer.setVelocityColor(Qt::darkMagenta);
     //    m_measurer.setAccelerationColor(Qt::darkCyan);
 
-        m_circle.setPosition(alVector2(200, 200));
-        m_circle.setRadius(80);
-        m_circle.setAngle(0);
-        m_circle.setSleep(false);
+//        m_circle.setPosition(alVector2(200, 200));
+//        m_circle.setRadius(80);
+//        m_circle.setAngle(0);
+//        m_circle.setSleep(false);
     //        m_circle.velocity() += v1;
     //        m_circle.acceleration() += alVector2(0, 8);
     //        m_circle.setAngularVelocity(20);
@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_circleRenderer.setThickness(2);
     m_circleRenderer.setAngleLineThickness(2);
-    m_circleRenderer.circleList().append(&m_circle);
+    //m_circleRenderer.circleList().append(&m_circle);
     //m_circleRenderer.circleList().append(&m_circle2);
 
     //    m_rectangle.setPosition(alVector2(300, 150));
@@ -85,31 +85,31 @@ MainWindow::MainWindow(QWidget *parent)
     //    m_rectangleRenderer.fillBrush().setColor(bc2);
     //    m_rectangleRenderer.strokePen().setColor(Qt::darkBlue);
 
-//        m_polygon.addVertex(alVector2(4, 3) * 25);
-//        m_polygon.addVertex(alVector2(3, 4) * 25);
-//        m_polygon.addVertex(alVector2(0, 5) * 25);
-//        m_polygon.addVertex(alVector2(-3, 4) * 25);
-//        m_polygon.addVertex(alVector2(-4, 3) * 25);
-//        m_polygon.addVertex(alVector2(-4, -3) * 25);
-//        m_polygon.addVertex(alVector2(-3, -4) * 25);
-//        m_polygon.addVertex(alVector2(0, -6) * 25);
-//        m_polygon.addVertex(alVector2(3, -4) * 25);
-//        m_polygon.addVertex(alVector2(4, -3) * 25);
-//        m_polygon.addVertex(alVector2(4, 3) * 25);
-    m_polygon.addVertex(alVector2(1, 4) * 15);
-    m_polygon.addVertex(alVector2(-1, 4) * 15);
-    m_polygon.addVertex(alVector2(-3, 0) * 15);
-    m_polygon.addVertex(alVector2(-2, -6) * 15);
-    m_polygon.addVertex(alVector2(0, -8) * 15);
-    m_polygon.addVertex(alVector2(3, -6) * 15);
-    m_polygon.addVertex(alVector2(4, 4) * 15);
-    m_polygon.addVertex(alVector2(1, 4) * 15);
+        m_polygon.addVertex(alVector2(4, 3) * 18);
+        m_polygon.addVertex(alVector2(3, 4) * 18);
+        m_polygon.addVertex(alVector2(0, 5) * 18);
+        m_polygon.addVertex(alVector2(-3, 4) * 18);
+        m_polygon.addVertex(alVector2(-4, 3) * 18);
+        m_polygon.addVertex(alVector2(-4, -3) * 18);
+        m_polygon.addVertex(alVector2(-3, -4) * 18);
+        m_polygon.addVertex(alVector2(0, -6) * 18);
+        m_polygon.addVertex(alVector2(3, -4) * 18);
+        m_polygon.addVertex(alVector2(4, -3) * 18);
+        m_polygon.addVertex(alVector2(4, 3) * 18);
+    //m_polygon.addVertex(alVector2(1, 4) * 15);
+    //m_polygon.addVertex(alVector2(-1, 4) * 15);
+    //m_polygon.addVertex(alVector2(-3, 0) * 15);
+    //m_polygon.addVertex(alVector2(-2, -6) * 15);
+    //m_polygon.addVertex(alVector2(0, -8) * 15);
+    //m_polygon.addVertex(alVector2(3, -6) * 15);
+    //m_polygon.addVertex(alVector2(4, 4) * 15);
+    //m_polygon.addVertex(alVector2(1, 4) * 15);
 
         //m_polygon.addVertex(alVector2(0, 3) * 15);
         //m_polygon.addVertex(alVector2(-3, -2) * 15);
         //m_polygon.addVertex(alVector2(4, -3) * 15);
         //m_polygon.addVertex(alVector2(0, 3) * 15);
-    m_polygon.setPosition(alVector2(250, 650));
+    m_polygon.setPosition(alVector2(450, 650));
     m_polygon.setAngle(36);
     m_polygon.setSleep(false);
 
@@ -119,17 +119,17 @@ MainWindow::MainWindow(QWidget *parent)
 //        m_polygon2.addVertex(alVector2(3, -5) * 25);
 //        m_polygon2.addVertex(alVector2(3, 4) * 25);
 
-    m_polygon2.addVertex(alVector2(0, 5) * 15);
-    m_polygon2.addVertex(alVector2(-2, 3) * 15);
-    m_polygon2.addVertex(alVector2(0, -8) * 15);
-    m_polygon2.addVertex(alVector2(2, 3) * 15);
-    m_polygon2.addVertex(alVector2(0, 5) * 15);
+    m_polygon2.addVertex(alVector2(0, 5) * 18);
+    m_polygon2.addVertex(alVector2(-2, 3) * 18);
+    m_polygon2.addVertex(alVector2(0, -8) * 18);
+    m_polygon2.addVertex(alVector2(2, 3) * 18);
+    m_polygon2.addVertex(alVector2(0, 5) * 18);
 
         //m_polygon2.addVertex(alVector2(2, 0) * 15);
         //m_polygon2.addVertex(alVector2(0, 2) * 15);
         //m_polygon2.addVertex(alVector2(-2, -2) * 15);
         //m_polygon2.addVertex(alVector2(2, 0) * 15);
-    m_polygon2.setPosition(alVector2(360, 680));
+    m_polygon2.setPosition(alVector2(680, 680));
     m_polygon2.setAngle(-39);
     m_polygon2.setSleep(false);
 
@@ -138,35 +138,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_polygonRenderer.polygonList().append(&m_polygon);
     m_polygonRenderer.polygonList().append(&m_polygon2);
 
-    //    pccd1.setCircle(&m_circle);
-    //        pccd1.setPolygon(&w1);
 
-    //        pccd2.setCircle(&m_circle);
-    //        pccd2.setPolygon(&w2);
-
-    //        pccd3.setCircle(&m_circle);
-    //        pccd3.setPolygon(&w3);
-
-    //        pccd4.setCircle(&m_circle);
-    //        pccd4.setPolygon(&w4);
-
-    //        ppcd1.setPolygon1(&m_polygon);
-    //        ppcd1.setPolygon2(&w1);
-
-    //        ppcd2.setPolygon1(&m_polygon);
-    //        ppcd2.setPolygon2(&w2);
-
-    //        ppcd3.setPolygon1(&m_polygon);
-    //        ppcd3.setPolygon2(&w3);
-
-    //        ppcd4.setPolygon1(&m_polygon);
-    //        ppcd4.setPolygon2(&w4);
-
-    //    ppcdObject.setPolygon1(&m_polygon);
-    //    ppcdObject.setPolygon2(&m_polygon2);
-
-    //    pccdObject.setCircle(&m_circle);
-    //    pccdObject.setPolygon(&m_polygon);
 
 
     m_wallRenderer.wallList().append(&w1);
@@ -228,18 +200,69 @@ void MainWindow::paintEvent(QPaintEvent *e)
         painter.drawLine(m_mouseStart, m_mousePos);
     }
 
-    alSATCollisionDetector sat;
-    std::pair<bool, alVector2> result = sat.detect(&m_polygon, &m_circle);
+    alSATCollisionDetector gjk;
+    std::pair<bool, alVector2> result = gjk.detect(&m_polygon, &m_polygon2);
 
     m_polygon.setIsTouched(result.first);
-	m_circle.setIsTouched(result.first);
+    m_polygon2.setIsTouched(result.first);
         if(result.first)
         {
             m_polygon.position() += result.second;
-            qDebug () << "penetration: " << result.second.x() << ", " << result.second.y();
+//            alVector2 temp = m_circle.velocity() * 0.6;
+//            m_circle.velocity() = m_polygon.velocity() * 0.6;
+//            m_polygon.velocity() = temp;
         }
+    alSATCollisionDetector sat;
+    result = sat.detect(&m_polygon2, &w1);
+    if(result.first)
+    {
+        m_polygon2.position() += result.second;
+        m_polygon2.velocity().setX(m_polygon2.velocity().x() * -1);
+    }
+    result = sat.detect(&m_polygon2, &w2);
+    if(result.first)
+    {
+        m_polygon2.position() += result.second;
+        m_polygon2.velocity().setY(m_polygon2.velocity().y() * -0.8);
+    }
+    result = sat.detect(&m_polygon2, &w3);
+    if(result.first)
+    {
+        m_polygon2.position() += result.second;
+        m_polygon2.velocity().setX(m_polygon2.velocity().x() * -1);
+    }
+    result = sat.detect(&m_polygon2, &w4);
+    if(result.first)
+    {
+        m_polygon2.position() += result.second;
+        m_polygon2.velocity().setY(m_polygon2.velocity().y() * -0.8);
+    }
 
 
+    result = sat.detect(&m_polygon, &w1);
+    if(result.first)
+    {
+        m_polygon.position() += result.second;
+        m_polygon.velocity().setX(m_polygon.velocity().x() * -1);
+    }
+    result = sat.detect(&m_polygon, &w2);
+    if(result.first)
+    {
+        m_polygon.position() += result.second;
+        m_polygon.velocity().setY(m_polygon.velocity().y() * -0.8);
+    }
+    result = sat.detect(&m_polygon, &w3);
+    if(result.first)
+    {
+        m_polygon.position() += result.second;
+        m_polygon.velocity().setX(m_polygon.velocity().x() * -1);
+    }
+    result = sat.detect(&m_polygon, &w4);
+    if(result.first)
+    {
+        m_polygon.position() += result.second;
+        m_polygon.velocity().setY(m_polygon.velocity().y() * -0.8);
+    }
     m_wallRenderer.render(&painter);
     m_polygonRenderer.render(&painter);
     m_circleRenderer.render(&painter);
@@ -260,10 +283,10 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *e)
     alVector2 massPos = m_polygon.massPosition() + m_polygon.position();
     alVector2 mousePos(m_mousePos.x(), m_mousePos.y());
     qDebug () << "torque: " << alCross2(mousePos - massPos, f1);
-    m_polygon.setTorque(alCross2(mousePos - massPos, f1) * 10);
+    m_polygon.setTorque(alCross2(mousePos - massPos, f1));
     m_polygon.setForces(f1);
-    m_circle.setTorque(alCross2(mousePos - massPos, f1) * 10);
-    m_circle.setForces(f1);
+    m_polygon2.setTorque(alCross2(mousePos - massPos, f1));
+    m_polygon2.setForces(f1);
     qDebug() << "release";
 }
 void MainWindow::mouseMoveEvent(QMouseEvent *e)

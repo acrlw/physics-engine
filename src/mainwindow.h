@@ -39,7 +39,6 @@ private:
 //    alRectangle m_rectangle;
 //    alRectangle m_rectangle2;
 //    alRectangleRenderer m_rectangleRenderer;
-    alCircleRenderer m_circleRenderer;
 
     //alCircleCircleCollisionDetector cccd1;
 //    alMeasurer m_measurer;
@@ -53,6 +52,7 @@ private:
     alPolygon m_polygon;
     alPolygon m_polygon2;
     alPolygonRenderer m_polygonRenderer;
+    alCircleRenderer m_circleRenderer;
     alWall w1,w2,w3,w4;
     alWallRenderer m_wallRenderer;
 };

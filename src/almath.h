@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <assert.h>
 #include <float.h>
-
+#include <iostream>
 
 ///Fast Inverse Square Root Algorithm From Quake III
 static inline float alFastInverseSqrt(float x)
@@ -72,26 +72,31 @@ public:
     inline alVector2 operator / (const float f) const{
         return alVector2(m_x / f, m_y / f);
     }
-    inline void operator += (const alVector2& v) {
-        m_x += v.x();
-        m_y += v.y();
+    inline alVector2& operator += (const alVector2& v) {
+        m_x += v.m_x;
+        m_y += v.m_y;
+        return *this;
     }
-    inline void operator -= (const alVector2& v) {
-        m_x -= v.x();
-        m_y -= v.y();
+    inline alVector2& operator -= (const alVector2& v) {
+        m_x -= v.m_x;
+        m_y -= v.m_y;
+        return *this;
     }
-    inline void operator *= (const float f) {
+    inline alVector2& operator *= (const float f) {
         m_x *= f;
         m_y *= f;
+        return *this;
     }
-    inline void operator /= (const float f){
+    inline alVector2& operator /= (const float f){
         m_x /= f;
         m_y /= f;
+        return *this;
     }
     inline bool operator ==(const alVector2& v)
     {
-        return m_x == v.x() && m_y == v.y();
+        return m_x == v.m_x && m_y == v.m_y;
     }
+
     ///
     /// \brief
     /// return the length of the vector
@@ -122,11 +127,12 @@ public:
     {
         m_y = y;
     }
-    inline void normalize() {
+    inline alVector2& normalize() {
         float r = alFastInverseSqrt(m_x * m_x + m_y * m_y);
         length();
         m_x *= r;
         m_y *= r;
+        return *this;
     }
     inline const alVector2 getNormalizedVector()
     {
@@ -140,13 +146,14 @@ public:
     }
     inline void set(const alVector2& v)
     {
-        m_x = v.x();
-        m_y = v.y();
+        m_x = v.m_x;
+        m_y = v.m_y;
     }
-    inline void negate()
+    inline alVector2& negate()
     {
         m_x = -m_x;
         m_y = -m_y;
+        return *this;
     }
     inline const alVector2 perpendicularVector()
     {
@@ -171,25 +178,25 @@ public:
     }
     alVector3(const alVector3& v)
     {
-        m_x = v.x();
-        m_y = v.y();
-        m_z = v.z();
+        m_x = v.m_x;
+        m_y = v.m_y;
+        m_z = v.m_z;
     }
 
     inline void operator= (const alVector3& v)
     {
-        m_x = v.x();
-        m_y = v.y();
-        m_z = v.z();
+        m_x = v.m_x;
+        m_y = v.m_y;
+        m_z = v.m_z;
     }
     inline alVector3 operator+ (const alVector3& v) const
     {
-        return alVector3(m_x + v.x(), m_y + v.y(), m_z + v.z());
+        return alVector3(m_x + v.m_x, m_y + v.m_y, m_z + v.m_z);
     }
 
     inline alVector3 operator- (const alVector3& v) const
     {
-        return alVector3(m_x - v.x(), m_y - v.y(), m_z - v.z());
+        return alVector3(m_x - v.m_x, m_y - v.m_y, m_z - v.m_z);
     }
     inline alVector3 operator* (const float f) const
     {
@@ -197,29 +204,39 @@ public:
     }
     inline float operator* (const alVector3& v) const
     {
-        return m_x * v.x() + m_y * v.y() + m_z * v.z();
+        return m_x * v.m_x + m_y * v.m_y + m_z * v.m_z;
     }
-    inline void operator+= (const alVector3& v)
+    inline alVector3& operator+= (const alVector3& v)
     {
-        m_x += v.x();
-        m_y += v.y();
-        m_z += v.z();
+        m_x += v.m_x;
+        m_y += v.m_y;
+        m_z += v.m_z;
+        return *this;
     }
-    inline void operator-= (const alVector3& v)
+    inline alVector3& operator-= (const alVector3& v)
     {
-        m_x -= v.x();
-        m_y -= v.y();
-        m_z -= v.z();
+        m_x -= v.m_x;
+        m_y -= v.m_y;
+        m_z -= v.m_z;
+        return *this;
     }
-    inline void operator*= (const float f)
+    inline alVector3& operator*= (const float f)
     {
         m_x *= f;
         m_y *= f;
         m_z *= f;
+        return *this;
+    }
+    inline alVector3& operator/= (const float f)
+    {
+        m_x /= f;
+        m_y /= f;
+        m_z /= f;
+        return *this;
     }
     inline bool operator ==(const alVector3& v)
     {
-        return m_x == v.x() && m_y == v.y() && m_z == v.z();
+        return m_x == v.m_x && m_y == v.m_y && m_z == v.m_z;
     }
     inline float lengthSquare()
     {
@@ -253,12 +270,13 @@ public:
     {
         m_z = z;
     }
-    inline void normalize()
+    inline alVector3& normalize()
     {
         float r = alFastInverseSqrt(m_x * m_x + m_y * m_y + m_z * m_z);
         m_x *= r;
         m_y *= r;
         m_z *= r;
+        return *this;
     }
     inline void set(const float x, const float y, const float z)
     {
@@ -271,11 +289,12 @@ public:
         float r = alFastInverseSqrt(m_x * m_x + m_y * m_y + m_z * m_z);
         return alVector3(m_x, m_y, m_z) * r;
     }
-    inline void negate()
+    inline alVector3& negate()
     {
         m_x = -m_x;
         m_y = -m_y;
         m_z = -m_z;
+        return *this;
     }
 private:
     float m_x;
@@ -300,16 +319,16 @@ public:
 
     inline void operator= (const alMatrix2x2& m)
     {
-        m_column1 = m.column1();
-        m_column2 = m.column2();
+        m_column1 = m.m_column1;
+        m_column2 = m.m_column2;
     }
     inline alMatrix2x2 operator+ (const alMatrix2x2& v) const
     {
-        return alMatrix2x2(m_column1 + v.column1() , m_column2 + v.column2());
+        return alMatrix2x2(m_column1 + v.m_column1 , m_column2 + v.m_column2);
     }
     inline alMatrix2x2 operator- (const alMatrix2x2& v) const
     {
-        return alMatrix2x2(m_column1 - v.column1() , m_column2 - v.column2());
+        return alMatrix2x2(m_column1 - v.m_column1 , m_column2 - v.m_column2);
     }
     inline alVector2 operator* (const alVector2& v) const
     {
@@ -317,17 +336,17 @@ public:
     }
     inline alMatrix2x2 operator* (const alMatrix2x2& v) const
     {
-        alMatrix2x2 m(m_column1, m_column2);
-        return alMatrix2x2(m * v.column1(), m * v.column2());
+        return alMatrix2x2(*this * v.m_column1, *this * v.m_column2);
     }
     inline alMatrix2x2 operator* (const float f) const
     {
         return alMatrix2x2(m_column1 * f, m_column2 * f);
     }
-    inline void operator*= (const float f)
+    inline alMatrix2x2& operator*= (const float f)
     {
         m_column1 *= f;
         m_column2 *= f;
+        return *this;
     }
 
     inline alVector2 column1() const{
@@ -342,9 +361,10 @@ public:
     inline void setColumn2(const alVector2 &column2){
         m_column2 = column2;
     }
-    inline void transpose(){
+    inline alMatrix2x2& transpose(){
         m_column1 = alVector2(m_column1.x() , m_column2.x());
         m_column2 = alVector2(m_column1.y() , m_column2.y());
+        return *this;
     }
 private:
     alVector2 m_column1;
@@ -370,18 +390,18 @@ public:
 
     inline void operator= (const alMatrix3x3& m)
     {
-        m_column1 = m.column1();
-        m_column2 = m.column2();
-        m_column3 = m.column3();
+        m_column1 = m.m_column1;
+        m_column2 = m.m_column2;
+        m_column3 = m.m_column3;
     }
     inline alMatrix3x3 operator+ (const alMatrix3x3& v) const
     {
-        return alMatrix3x3(m_column1 + v.column1() , m_column2 + v.column2(), m_column3 + v.column3());
+        return alMatrix3x3(m_column1 + v.m_column1 , m_column2 + v.m_column2, m_column3 + v.m_column3);
     }
 
     inline alMatrix3x3 operator- (const alMatrix3x3& v) const
     {
-        return alMatrix3x3(m_column1 - v.column1() , m_column2 - v.column2(), m_column3 - v.column3());
+        return alMatrix3x3(m_column1 - v.m_column1 , m_column2 - v.m_column2, m_column3 - v.m_column3);
     }
     inline alVector3 operator* (const alVector3& v) const
     {
@@ -391,14 +411,14 @@ public:
     }
     inline alMatrix3x3 operator* (const alMatrix3x3& v) const
     {
-        alMatrix3x3 m(m_column1, m_column2, m_column3);
-        return alMatrix3x3(m * v.column1(), m * v.column2(), m * v.column3());
+        return alMatrix3x3(*this * v.m_column1, *this * v.m_column2, *this * v.m_column3);
     }
-    inline void operator*= (const float f)
+    inline alMatrix3x3& operator*= (const float f)
     {
         m_column1 *= f;
         m_column2 *= f;
         m_column3 *= f;
+        return *this;
     }
 
     inline alVector3 column1() const
@@ -422,10 +442,11 @@ public:
     inline void setColumn3(const alVector3 &column3){
         m_column3 = column3;
     }
-    inline void transpose(){
+    inline alMatrix3x3& transpose(){
         m_column1 = alVector3(m_column1.x() , m_column2.x(), m_column3.x());
         m_column2 = alVector3(m_column1.y() , m_column2.y(), m_column3.y());
         m_column3 = alVector3(m_column1.z() , m_column2.z(), m_column3.z());
+        return *this;
     }
 private:
     alVector3 m_column1;
@@ -475,25 +496,14 @@ private:
     float m_arc;
     alMatrix2x2 m_rotMat;
 };
-class alTransform
+inline std::ostream &operator << (std::ostream& os, const alVector2& v)
 {
-public:
-    alTransform(): m_rotMat(0) {
-
-    }
-    void offset(const float x, const float y);
-
-    void rotate(const float angle);
-
-    void scale(const float factor);
-
-    void toVecolumn2();
-private:
-    alRotation m_rotMat;
-    alVector2 m_vector;
-    alVector2 m_origin;
-};
-
+    return os << '(' << v.x() << ',' << v.y() << ')';
+}
+inline std::ostream &operator << (std::ostream& os, const alVector3& v)
+{
+    return os << '(' << v.x() << ',' << v.y() << ',' << v.z() << ')';
+}
 static inline float alCross2(const alVector2& l, const alVector2& r)
 {
     return l.x() * r.y() - r.x() * l.y();

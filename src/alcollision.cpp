@@ -100,10 +100,7 @@ int alSATCollisionDetector::polygonSATDetection(alPolygon *p1, alPolygon *p2)
         alVector2 maxVector1 = perpendicular * b1_max;
         alVector2 minVector2 = perpendicular * b2_min;
         alVector2 maxVector2 = perpendicular * b2_max;
-        minVector1 += p1->position();
-        maxVector1 += p1->position();
-        minVector2 += p1->position();
-        maxVector2 += p1->position();
+
         float dt1 = b1_max - b2_min;
         float dt2 = b2_max - b1_min;
         float min = abs(dt1) > abs(dt2) ? dt2 : dt1;
@@ -211,10 +208,7 @@ bool alSATCollisionDetector::circleSATDetection(alCircle *body1, alPolygon *body
         float min = abs(dt1) > abs(dt2) ? dt2 : dt1;
 
 
-        minVector1 += body2->position();
-        maxVector1 += body2->position();
-        minVector2 += body2->position();
-        maxVector2 += body2->position();
+
         if(i == 0)
         {
             shortestLength = abs(min);
@@ -285,10 +279,7 @@ bool alSATCollisionDetector::circleSATDetection(alCircle *body1, alPolygon *body
     alVector2 minVector2 = edge * b2_min;
     alVector2 maxVector2 = edge * b2_max;
 
-    minVector1 += body2->position();
-    maxVector1 += body2->position();
-    minVector2 += body2->position();
-    maxVector2 += body2->position();
+
 
     float dt1 = b1_max - b2_min;
     float dt2 = b2_max - b1_min;
@@ -455,7 +446,7 @@ void alGJKCollisionDetector::doEPA(alBody *body1, alBody *body2, alSimplex &simp
             //optimization
             float even = sqrt(d * originToEdge);
             if (abs(difference) < alEPAEpsilon) {
-                m_minimumPenetration = normal * even;
+                m_minimumPenetration = normal * d;
             } else {
                 //check if we have already saved the same Minkowski Difference
                 bool isExisted = false;
@@ -469,7 +460,7 @@ void alGJKCollisionDetector::doEPA(alBody *body1, alBody *body2, alSimplex &simp
                 }
                 if(isExisted)
                 {
-                    m_minimumPenetration = normal * even;
+                    m_minimumPenetration = normal * d;
                     return;
                 }
                 else
@@ -495,17 +486,13 @@ alVector2 alGJKCollisionDetector::getDirection(alSimplex &simplex, bool towardsO
         //
         simplex = findClosestEdge(simplex);
     }
-    //count = 2
     //make the vector always point to origin
     //generate perpendicular vector of line, making it point to the origin
-    //qDebug() << "simplex 2!";
     alVector2 ao = simplex.vertices()[0] * -1;
     alVector2 ab = simplex.vertices()[1] - simplex.vertices()[0];
     alVector2 perpendicularOfAB = ab.perpendicularVector();
     result = perpendicularOfAB;
-    if(ao * perpendicularOfAB < 0 && towardsOrigin)
-        result.negate();
-    else if(ao * perpendicularOfAB > 0 && !towardsOrigin)
+    if((ao * perpendicularOfAB < 0 && towardsOrigin) || (ao * perpendicularOfAB > 0 && !towardsOrigin))
         result.negate();
     return result;
 }
